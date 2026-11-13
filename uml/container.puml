@@ -1,0 +1,18 @@
+@startuml container
+!define C4P https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
+!includeurl C4P/C4_Container.puml
+ title C4 Level 2 - Containers
+Person(volunteer, "Volunteer", "Uses the platform")
+Person(organizer, "Event Organizer", "Coordinates events")
+Person(admin, "Administrator", "Oversees the platform")
+System_Boundary(evm, "Event & Volunteer Management System") {
+ Container(web, "Web Frontend", "React, JavaScript, HTML, CSS", "Role-aware browser UI for event discovery, applications, assignments, attendance and reports")
+ Container(api, "Application Backend", "Node.js, Express", "HTTP API, authentication and authorization, business rules and validation")
+ ContainerDb(db, "Relational Database", "MySQL", "Persistent users, events, applications, assignments, attendance and participation hours")
+}
+Rel(volunteer, web, "Uses", "HTTPS")
+Rel(organizer, web, "Uses", "HTTPS")
+Rel(admin, web, "Uses", "HTTPS")
+Rel(web, api, "Makes API requests", "HTTPS / JSON")
+Rel(api, db, "Reads and writes", "SQL")
+@enduml

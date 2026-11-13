@@ -1,0 +1,31 @@
+@startuml component
+!define C4P https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
+!includeurl C4P/C4_Component.puml
+ title C4 Level 3 - Backend Components
+Container_Boundary(api, "Application Backend (Node.js / Express)") {
+ Component(routes, "API Routes", "Express routers", "Expose HTTP endpoints and dispatch requests")
+ Component(auth, "Authentication & Authorization", "Middleware / service", "Verify identity, manage sessions or tokens, enforce role access")
+ Component(users, "User Management", "Service", "Registration, login, role-based account administration")
+ Component(events, "Event Management", "Service", "Create, edit, cancel, browse, search and retrieve event details")
+ Component(applications, "Application Management", "Service", "Submit, review, approve or reject volunteer applications")
+ Component(assignments, "Task Assignment", "Service", "Assign responsibilities to approved volunteers and expose assignments")
+ Component(attendance, "Attendance & Hours", "Service", "Record attendance and calculate participation hours")
+ Component(reports, "Statistics & Reporting", "Service", "Event participation and platform-wide statistics")
+ Component(persistence, "Data Access", "MySQL data access layer", "Execute parameterized queries and map relational records")
+}
+ContainerDb(db, "MySQL Database", "MySQL", "Users, events, applications, assignments and attendance")
+Rel(routes, auth, "Protects requests with")
+Rel(routes, users, "Dispatches account requests to")
+Rel(routes, events, "Dispatches event requests to")
+Rel(routes, applications, "Dispatches application requests to")
+Rel(routes, assignments, "Dispatches assignment requests to")
+Rel(routes, attendance, "Dispatches attendance requests to")
+Rel(routes, reports, "Dispatches statistics requests to")
+Rel(users, persistence, "Reads / writes")
+Rel(events, persistence, "Reads / writes")
+Rel(applications, persistence, "Reads / writes")
+Rel(assignments, persistence, "Reads / writes")
+Rel(attendance, persistence, "Reads / writes")
+Rel(reports, persistence, "Queries aggregates")
+Rel(persistence, db, "SQL")
+@enduml
