@@ -38,6 +38,9 @@ Name: Layan Abu Salah            StudentId: 20241108
 
 ## 10.6 Contributions
 
-
+• Layan ALqardahji: Responsible for identifying and designing the system architecture and the class diagram.
+• Leen Qasem: Responsible for defining and documenting the non-functional requirements, as well as creating the Use Case Diagram .
+• Layan Sanabrah: Responsible for gathering and documenting the functional requirements, as well as creating the Sequence Diagram.
+• Layan Abu Salah: The Activity Diagram and Database Diagram.
 
 ---
