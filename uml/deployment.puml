@@ -1,0 +1,36 @@
+@startuml deployment
+!define C4P https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
+!includeurl C4P/C4_Deployment.puml
+
+title C4 Deployment View - Event & Volunteer Management System
+
+Deployment_Node(clientDevice, "Client Browser Node", "User device / supported browser", "Desktop, tablet, or mobile browser; responsive UI and browser compatibility per NFR-21 and NFR-30") {
+  Container(browserApp, "React Web Frontend", "React SPA", "Runs in the browser; receives the frontend bundle over HTTPS/TLS")
+}
+
+Deployment_Node(appNode, "Application Server Node (xN)", "Vendor-neutral application compute", "Replicate horizontally as traffic grows (NFR-10, NFR-12); portable deployment configuration (NFR-31)") {
+  Container(reactBundle, "React Frontend Bundle", "Static HTML / CSS / JavaScript", "Serves the frontend bundle to client browsers over HTTPS/TLS")
+  Container(api, "Application Backend", "Node.js / Express", "Application API, business logic, email integration, and scheduled backup process")
+}
+
+Deployment_Node(privateNetwork, "Private Network", "Restricted network segment", "Database is not publicly reachable; inbound SQL access is limited to the application backend") {
+  Deployment_Node(dbNode, "Database Server Node", "Vendor-neutral database compute", "Encrypted storage at rest; portable database/deployment configuration (NFR-15, NFR-31)") {
+    ContainerDb(mysql, "MySQL Relational Database", "MySQL", "Application data; SQL access restricted to the backend (NFR-16)")
+  }
+}
+
+Deployment_Node(emailInfra, "External Email Infrastructure", "External managed service", "Provider is not selected") {
+  Container_Ext(email, "Email Service", "SMTP / HTTPS", "Registration/verification and application status emails (FR-01, FR-12); external wait excluded by NFR-03")
+}
+
+Deployment_Node(backupInfra, "External Backup Infrastructure", "External managed storage", "Vendor-neutral offsite backup destination") {
+  Container_Ext(backup, "Cloud Backup Storage", "HTTPS object / file storage", "Automated daily MySQL backups; minimum 30-day retention; supports 4-hour recovery objective (NFR-06, NFR-07)")
+}
+
+Rel(reactBundle, browserApp, "Serves React frontend bundle to browser", "HTTPS / TLS (NFR-15)")
+Rel(browserApp, api, "Uses application API", "HTTPS / TLS (NFR-15)")
+Rel(api, mysql, "Reads and writes; backend-only SQL over private network", "MySQL / TLS (NFR-15, NFR-16)")
+Rel(api, email, "Sends registration/verification and application status emails", "SMTP over TLS / HTTPS (FR-01, FR-12)")
+Rel(api, backup, "Uploads automated daily MySQL backups", "HTTPS (NFR-06, NFR-07)")
+
+@enduml
