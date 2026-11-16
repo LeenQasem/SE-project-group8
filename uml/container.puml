@@ -5,14 +5,18 @@
 Person(volunteer, "Volunteer", "Uses the platform")
 Person(organizer, "Event Organizer", "Coordinates events")
 Person(admin, "Administrator", "Oversees the platform")
+System_Ext(email, "Email Service", "Account registration/verification and application status messages")
+System_Ext(backup, "Cloud Backup Storage", "Offsite backups; daily schedule, 30-day retention, recovery support")
 System_Boundary(evm, "Event & Volunteer Management System") {
  Container(web, "Web Frontend", "React, JavaScript, HTML, CSS", "Role-aware browser UI for event discovery, applications, assignments, attendance and reports")
- Container(api, "Application Backend", "Node.js, Express", "HTTP API, authentication and authorization, business rules and validation")
+ Container(api, "Application Backend", "Node.js, Express", "HTTP API, authentication and authorization, business rules, email notifications and scheduled backup process")
  ContainerDb(db, "Relational Database", "MySQL", "Persistent users, events, applications, assignments, attendance and participation hours")
 }
 Rel(volunteer, web, "Uses", "HTTPS")
 Rel(organizer, web, "Uses", "HTTPS")
 Rel(admin, web, "Uses", "HTTPS")
 Rel(web, api, "Makes API requests", "HTTPS / JSON")
-Rel(api, db, "Reads and writes", "SQL")
+Rel(api, db, "Reads and writes application data; creates daily backup export", "SQL / MySQL dump")
+Rel(api, email, "Sends registration/verification and application status emails", "SMTP / HTTPS")
+Rel(api, backup, "Uploads automated daily MySQL backups", "HTTPS")
 @enduml

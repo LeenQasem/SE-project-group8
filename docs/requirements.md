@@ -95,3 +95,8 @@
 - **NFR-30:** The system shall support the latest two stable versions of major modern browsers, including Google Chrome, Mozilla Firefox, Microsoft Edge, and Apple Safari.
 - **NFR-31:** The system shall use a database and deployment configuration that can be moved to another supported hosting environment without changing business rules or losing application data.
 - **NFR-32:** The system shall use a consistent time-zone strategy and shall display event dates and times in the relevant event or user time zone to prevent scheduling ambiguity.
+
+## External Interfaces and Dependencies
+
+- The application backend integrates with an external Email Service over SMTP/HTTPS for account registration/verification and volunteer application status messages (FR-01, FR-12). External-service wait time is excluded as specified by NFR-03.
+- The application performs automated daily MySQL backups to offsite Cloud Backup Storage over HTTPS, with a minimum 30-day retention target and recovery support for the 4-hour restoration objective (NFR-06, NFR-07).

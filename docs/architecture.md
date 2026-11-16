@@ -2,52 +2,54 @@
 
 ## Overview and architectural style
 
-The Event & Volunteer Management System is a web-based, three-tier client-server application. A browser-based React frontend presents the system to Administrators, Event Organizers, and Volunteers. It communicates over HTTPS with a Node.js/Express backend, which applies authentication, role authorization, validation, and business rules. The backend is the only application tier that accesses the MySQL database; the browser does not connect to MySQL directly.
+The Event & Volunteer Management System is a web-based, three-tier client-server application. A browser-based React frontend presents the system to Administrators, Event Organizers, and Volunteers. It communicates over HTTPS with a Node.js/Express backend, which applies authentication, role authorization, validation, and business rules. The backend accesses the MySQL database and integrates with two external systems: an Email Service and Cloud Backup Storage. The browser does not connect directly to MySQL or either external system.
 
 ### Three tiers
 
-1. **Presentation tier — React client:** Renders role-aware screens, gathers user input, and displays event listings/details, application status, assignments, attendance records, volunteer hours, and administrative or organizer statistics. It sends and receives JSON API requests over HTTPS.
-2. **Application tier — Node.js and Express server:** Exposes HTTP API routes, authenticates requests, enforces the Administrator / Event Organizer / Volunteer permissions, validates input, and runs the use-case logic. Its services coordinate user, event, application, assignment, attendance, and reporting operations.
-3. **Data tier — MySQL database:** Stores persistent account and role data, events, volunteer applications and decisions, task assignments, attendance, and the records needed to calculate participation hours and statistics. The backend accesses it using SQL through a data-access boundary.
+1. **Presentation tier — React client:** Renders role-aware screens, gathers user input, and displays event listings/details, application status, assignments, attendance records, volunteer hours, and reports. It sends and receives JSON API requests over HTTPS.
+2. **Application tier — Node.js and Express server:** Exposes HTTP API routes, authenticates requests, enforces Administrator / Event Organizer / Volunteer permissions, validates input, and runs business logic. It coordinates user, event, application, assignment, attendance, reporting, email notification, and scheduled backup operations.
+3. **Data tier — MySQL database:** Stores persistent account and role data, events, volunteer applications and decisions, task assignments, attendance, and records used to calculate participation hours and statistics. The backend accesses it using SQL through a data-access boundary.
 
-The client-server separation centralizes business rules and access control in the backend, while the relational data tier provides durable storage and relationships between users, events, and participation records. These are logical tiers; deployment topology and hosting choices have not yet been specified.
+The application backend is also the integration boundary for the external systems. It sends registration/verification and application status messages to the Email Service over SMTP/HTTPS. A scheduled backend process exports MySQL application data and uploads daily backups over HTTPS to offsite Cloud Backup Storage. Configure that storage for at least 30 days of retention; the backup and restoration procedure supports the NFR-07 four-hour recovery objective. NFR-03 explicitly excludes time waiting for external services. These are logical responsibilities; provider, credentials, and deployment topology remain unspecified.
 
 ## C4 Level 1 — System Context
 
-![C4 Level 1 System Context](../uml/rendered/system_context.png)
+![C4 Level 1 System Context](../uml/rendered/system_contex.png)
 
-The system boundary contains the Event & Volunteer Management System as one product. Its three external human actors are:
+The system boundary contains the Event & Volunteer Management System. Its human actors remain:
 
-- **Volunteer:** discovers and searches available events, reviews details, submits applications, and checks application decisions, assigned tasks, attendance, and total volunteer hours.
-- **Event Organizer:** creates, edits, or cancels events; reviews and decides applications; assigns tasks to approved volunteers; records attendance; and reviews event participation statistics.
-- **Administrator:** manages user accounts and reviews overall platform statistics.
+- **Volunteer:** discovers events, applies, and checks application decisions, assignments, attendance, and hours.
+- **Event Organizer:** manages events, reviews applications, assigns tasks, records attendance, and reviews event statistics.
+- **Administrator:** manages user accounts and reviews platform statistics.
 
-All three actors interact with the system through its web interface. The context view intentionally treats the application as a single system and does not show its internal technology or data stores.
+Two external systems support the functional and operational requirements:
+
+- **Email Service:** receives email requests from the application for account registration/verification (FR-01) and volunteer application approval/rejection status (FR-12). The integration uses SMTP/HTTPS; NFR-03's completion time excludes waiting on this external service.
+- **Cloud Backup Storage:** receives automated daily MySQL backups over HTTPS for offsite retention. Its intended configuration retains backups for at least 30 days (NFR-06) and supports the four-hour restoration objective after a declared incident (NFR-07).
 
 ## C4 Level 2 — Container
 
 ![C4 Level 2 Container](../uml/rendered/container.png)
 
-The system is decomposed into three runtime containers. The **Web Frontend** is a React application running in the user's browser. It presents role-appropriate workflows and exchanges JSON requests with the **Application Backend** using HTTPS. The backend is a Node.js process using Express; it owns API routing, authentication and authorization, validation, and domain operations. It reads and writes the **MySQL Relational Database** using SQL. The database stores user, event, application, assignment, and attendance information. Users reach the frontend over HTTPS; there is no direct browser-to-database connection.
+The three-tier containers remain the React **Web Frontend**, Node.js/Express **Application Backend**, and **MySQL Relational Database**. People use the frontend over HTTPS; it sends JSON API requests to the backend over HTTPS. The backend reads and writes the database using SQL and initiates daily MySQL backup exports. It sends registration/verification and application status emails to the external **Email Service** via SMTP/HTTPS. It uploads automated daily backup exports to external **Cloud Backup Storage** via HTTPS. The external storage is configured for a minimum 30-day retention period and is part of the recovery design for the NFR-07 four-hour objective. No browser-to-database or browser-to-external-service connection is shown.
 
 ## C4 Level 3 — Component
 
 ![C4 Level 3 Backend Components](../uml/rendered/component.png)
 
-The Level 3 view expands the Express application backend into responsibility-focused components:
+The Level 3 view expands the Express backend into responsibility-focused components:
 
-- **API Routes** expose endpoints and dispatch incoming requests.
-- **Authentication & Authorization** verifies identity and enforces role access before protected operations.
-- **User Management** handles account registration, login, and administrator account management.
-- **Event Management** supports event creation, editing, cancellation, discovery, search, and details.
-- **Application Management** accepts volunteer applications and lets organizers review, approve, or reject them.
-- **Task Assignment** assigns responsibilities to approved volunteers and returns their assignments.
-- **Attendance & Hours** records attendance and derives participation hours from those records.
-- **Statistics & Reporting** produces event participation and platform-wide statistics.
-- **Data Access** centralizes MySQL queries and record mapping; domain services use it rather than connecting directly to the database.
+- **API Routes** expose endpoints and dispatch incoming requests; **Authentication & Authorization** verifies identity and enforces roles.
+- **User Management**, **Event Management**, **Application Management**, **Task Assignment**, **Attendance & Hours**, and **Statistics & Reporting** implement the corresponding use cases and access the database through **Data Access**.
+- **Email Notifications** receives triggers from user registration/verification and application approval/rejection workflows, then sends messages to the external Email Service using SMTP/HTTPS. External-service waiting is excluded from NFR-03 timing.
+- **Scheduled Backup & Recovery** runs the daily MySQL export, uploads it to external Cloud Backup Storage using HTTPS, and supports the documented restore procedure. Configure offsite retention for at least 30 days; backup and recovery operations support NFR-06 and NFR-07.
 
-This is a logical component design derived from the project requirements, not a claim that these modules or implementation details already exist in application code. Endpoint contracts, authentication mechanism, schema, and deployment decisions remain to be defined during implementation.
+Component boundaries and the scheduled process are logical design responsibilities, not claims that application code or external provider configuration already exists. Endpoint contracts, provider, schema, deployment, retention configuration, and restore runbook remain implementation/deployment decisions.
 
-## Diagram source files
+## Requirement alignment
 
-Editable PlantUML source is in `uml/system_context.puml`, `uml/container.puml`, and `uml/component.puml`. Rendered diagrams are in `uml/rendered/`.
+Email integration supports FR-01 and FR-12; NFR-03 excludes external-service wait time. Daily offsite backups with 30-day retention address NFR-06, while the restore procedure and stored backups support the NFR-07 four-hour recovery objective. A requirement mapping is recorded in `docs/traceability_matrix.md`.
+
+## Diagram sources
+
+Editable PlantUML sources: `uml/system_context.puml`, `uml/container.puml`, and `uml/component.puml`. Rendered PNGs: `uml/rendered/system_contex.png`, `uml/rendered/container.png`, and `uml/rendered/component.png`.

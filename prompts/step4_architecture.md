@@ -2,22 +2,24 @@
 
 ## User request
 
-Complete Step 4 for the Event & Volunteer Management System (React frontend, Node.js/Express backend, MySQL database): document the three-tier client-server architecture and C4 Level 1 (System Context), Level 2 (Container), and Level 3 (Component); link the documentation to PNG diagrams under `uml/rendered/`; create PlantUML sources and render PNGs; create this prompt record and a Step 4 entry in the AI development log. Do not write application code.
+Complete Step 4 for the Event & Volunteer Management System using React, Node.js/Express, and MySQL. Document the three-tier client-server architecture and C4 Levels 1–3, create PlantUML sources and rendered PNGs, and log the work without writing application code. The architecture includes these requirement-linked external systems:
 
-## Architecture inputs used
+- **Email Service (`System_Ext`):** application backend sends account registration/verification and volunteer application status emails over SMTP/HTTPS; supports FR-01, FR-12, with external wait excluded by NFR-03.
+- **Cloud Backup Storage (`System_Ext`):** backend scheduled process uploads automated daily MySQL backups over HTTPS, with 30-day retention and support for the NFR-07 four-hour recovery objective; supports NFR-06 and NFR-07.
 
-- `README.md`: system purpose, three roles, technology summary, and intended event/volunteer workflows.
-- `docs/requirements.md`: FR-01–FR-21 covering accounts and roles, event management, applications, task assignment, attendance/hours, and reports/administration.
-- User-provided stack clarification: React frontend, Node.js/Express backend, MySQL database.
+## Architecture inputs
 
-## Decisions recorded
+- `docs/requirements.md` is the source of truth for FR-01–FR-21 and NFR-01–NFR-32. Relevant requirements: FR-01, FR-12, NFR-03, NFR-06, and NFR-07.
+- `docs/architecture.md`: existing React / Node.js-Express / MySQL three-tier design and role workflows.
 
-- Use a logical three-tier client-server model: React presentation tier, Express application tier, and MySQL data tier. The browser communicates with the backend over HTTPS/JSON; only the backend accesses MySQL.
-- Treat the three C4 views at their requested levels. Level 1 shows the three human actors and the system; Level 2 shows frontend/backend/database containers; Level 3 expands backend responsibilities into API, access-control, domain-service, and data-access components.
-- Component boundaries are a proposed logical design derived from requirements; no application modules or code are represented as already implemented.
-- Keep hosting topology, API contracts, authentication mechanism, and detailed schema unspecified because project materials do not define them.
-- Save editable diagrams as PlantUML in `uml/` and export PNG views to `uml/rendered/`.
+## Decisions
 
-## Scope boundary
+- Retain Volunteer, Event Organizer, and Administrator as the human actors and preserve the three logical tiers.
+- Show both external systems at C4 Levels 1 and 2. At Level 3, add Email Notifications and Scheduled Backup & Recovery backend components to show the same interactions.
+- Backend initiates email delivery via SMTP/HTTPS and daily database backup uploads via HTTPS. Storage retention and recovery objectives are explicitly tied to NFR-06 and NFR-07. Do not imply integrations are implemented or provider chosen.
+- Preserve existing FR/NFR statements; add only a short external interfaces/dependencies note to requirements.
+- Keep exact existing rendered image names, including `system_contex.png`.
 
-This step changes architecture documentation, the AI log, the prompt record, and diagram artifacts only. No application code is part of this work.
+## Scope
+
+Update architecture-related diagrams, PNGs, requirement dependency note, traceability, report, README architecture summary, this prompt record, and AI development log. No application code is written.

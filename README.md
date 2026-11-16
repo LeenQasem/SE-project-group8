@@ -27,7 +27,7 @@ Name: Layan Abu Salah            StudentId: 20241108
 ---
 
 ## 10.4 Repository Structure
-* `/database` — Stores database schema definitions, migration scripts, and initial seed data.
+* `/database` â€” Stores database schema definitions, migration scripts, and initial seed data.
 
 
 ---
@@ -38,9 +38,11 @@ Name: Layan Abu Salah            StudentId: 20241108
 
 ## 10.6 Contributions
 
-• Layan ALqardahji: Responsible for identifying and designing the system architecture and the class diagram.
-• Leen Qasem: Responsible for defining and documenting the non-functional requirements, as well as creating the Use Case Diagram .
-• Layan Sanabrah: Responsible for gathering and documenting the functional requirements, as well as creating the Sequence Diagram.
-• Layan Abu Salah: The Activity Diagram and Database Diagram.
+â€¢ Layan ALqardahji: Responsible for identifying and designing the system architecture and the class diagram.
+â€¢ Leen Qasem: Responsible for defining and documenting the non-functional requirements, as well as creating the Use Case Diagram .
+â€¢ Layan Sanabrah: Responsible for gathering and documenting the functional requirements, as well as creating the Sequence Diagram.
+â€¢ Layan Abu Salah: The Activity Diagram and Database Diagram.
 
 ---
+
+**Architecture update:** The three-tier React / Node.js-Express / MySQL design integrates with an Email Service for registration/verification and application status messages (FR-01, FR-12), and Cloud Backup Storage for daily offsite MySQL backups with 30-day retention and recovery support (NFR-03, NFR-06, NFR-07). See `docs/architecture.md`, `docs/traceability_matrix.md`, and the C4 diagrams under `uml/`.

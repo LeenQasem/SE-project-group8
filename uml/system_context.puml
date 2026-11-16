@@ -6,7 +6,11 @@ Person(volunteer, "Volunteer", "Browses events, applies, views assignments, atte
 Person(organizer, "Event Organizer", "Creates events, reviews applications, assigns tasks and records attendance")
 Person(admin, "Administrator", "Manages user accounts and views platform statistics")
 System(evm, "Event & Volunteer Management System", "Web platform for event organization and volunteer coordination")
+System_Ext(email, "Email Service", "Sends account registration/verification and volunteer application status emails")
+System_Ext(backup, "Cloud Backup Storage", "Offsite storage for automated daily MySQL backups; 30-day retention supports 4-hour recovery objective")
 Rel(volunteer, evm, "Browses events, applies and tracks participation")
 Rel(organizer, evm, "Manages events and volunteer participation")
 Rel(admin, evm, "Administers accounts and views statistics")
+Rel(evm, email, "Sends registration/verification and application status emails", "SMTP / HTTPS")
+Rel(evm, backup, "Uploads automated daily MySQL backups", "HTTPS")
 @enduml

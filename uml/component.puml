@@ -1,7 +1,9 @@
 @startuml component
 !define C4P https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
 !includeurl C4P/C4_Component.puml
- title C4 Level 3 - Backend Components
+ title C4 Level 3 - Backend Components and External Integrations
+System_Ext(email, "Email Service", "SMTP / HTTPS delivery provider")
+System_Ext(backup, "Cloud Backup Storage", "HTTPS offsite backup repository; 30-day retention")
 Container_Boundary(api, "Application Backend (Node.js / Express)") {
  Component(routes, "API Routes", "Express routers", "Expose HTTP endpoints and dispatch requests")
  Component(auth, "Authentication & Authorization", "Middleware / service", "Verify identity, manage sessions or tokens, enforce role access")
@@ -12,8 +14,10 @@ Container_Boundary(api, "Application Backend (Node.js / Express)") {
  Component(attendance, "Attendance & Hours", "Service", "Record attendance and calculate participation hours")
  Component(reports, "Statistics & Reporting", "Service", "Event participation and platform-wide statistics")
  Component(persistence, "Data Access", "MySQL data access layer", "Execute parameterized queries and map relational records")
+ Component(notifications, "Email Notifications", "Backend integration", "Trigger registration/verification and application decision messages")
+ Component(backupJob, "Scheduled Backup & Recovery", "Background process", "Create automated daily MySQL backup exports, upload offsite, and support restoration procedure")
 }
-ContainerDb(db, "MySQL Database", "MySQL", "Users, events, applications, assignments and attendance")
+ContainerDb(db, "MySQL Database", "MySQL", "Application data: users, events, applications, assignments and attendance")
 Rel(routes, auth, "Protects requests with")
 Rel(routes, users, "Dispatches account requests to")
 Rel(routes, events, "Dispatches event requests to")
@@ -27,5 +31,10 @@ Rel(applications, persistence, "Reads / writes")
 Rel(assignments, persistence, "Reads / writes")
 Rel(attendance, persistence, "Reads / writes")
 Rel(reports, persistence, "Queries aggregates")
+Rel(applications, notifications, "Triggers application status email after decision")
+Rel(users, notifications, "Triggers registration/verification email")
+Rel(notifications, email, "Sends email", "SMTP / HTTPS")
+Rel(backupJob, db, "Exports MySQL data daily", "MySQL dump")
+Rel(backupJob, backup, "Uploads offsite backup; configured retention >= 30 days", "HTTPS")
 Rel(persistence, db, "SQL")
 @enduml
