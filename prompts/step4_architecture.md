@@ -1,8 +1,8 @@
-# Step 4 â€” System Architecture: Prompt Record
+# Step 4 System Architecture: Prompt Record
 
 ## User request
 
-Complete Step 4 for the Event & Volunteer Management System using React, Node.js/Express, and MySQL. Document the three-tier client-server architecture and C4 Levels 1â€“3, create PlantUML sources and rendered PNGs, and log the work without writing application code. The architecture includes these requirement-linked external systems:
+Complete Step 4 for the Event & Volunteer Management System using React, Node.js/Express, and MySQL. Document the three-tier client-server architecture and C4 Levels , create PlantUML sources and rendered PNGs, and log the work without writing application code. The architecture includes these requirement-linked external systems:
 
 - **Email Service (`System_Ext`):** application backend sends account registration/verification and volunteer application status emails over SMTP/HTTPS; supports FR-01, FR-12, with external wait excluded by NFR-03.
 - **Cloud Backup Storage (`System_Ext`):** backend scheduled process uploads automated daily MySQL backups over HTTPS, with 30-day retention and support for the NFR-07 four-hour recovery objective; supports NFR-06 and NFR-07.

@@ -12,7 +12,7 @@ The Event & Volunteer Management System is a web-based, three-tier client-server
 
 The application backend is also the integration boundary for the external systems. It sends registration/verification and application status messages to the Email Service over SMTP/HTTPS. A scheduled backend process exports MySQL application data and uploads daily backups over HTTPS to offsite Cloud Backup Storage. Configure that storage for at least 30 days of retention; the backup and restoration procedure supports the NFR-07 four-hour recovery objective. NFR-03 explicitly excludes time waiting for external services. These are logical responsibilities; provider and credentials remain unselected. Deployment placement is documented in the vendor-neutral C4 Deployment View below.
 
-## C4 Level 1 â€” System Context
+## C4 Level 1  System Context
 
 ![C4 Level 1 System Context](../uml/rendered/system_contex.png)
 
@@ -27,13 +27,13 @@ Two external systems support the functional and operational requirements:
 - **Email Service:** receives email requests from the application for account registration/verification (FR-01) and volunteer application approval/rejection status (FR-12). The integration uses SMTP/HTTPS; NFR-03's completion time excludes waiting on this external service.
 - **Cloud Backup Storage:** receives automated daily MySQL backups over HTTPS for offsite retention. Its intended configuration retains backups for at least 30 days (NFR-06) and supports the four-hour restoration objective after a declared incident (NFR-07).
 
-## C4 Level 2 â€” Container
+## C4 Level 2 Container
 
 ![C4 Level 2 Container](../uml/rendered/container.png)
 
 The three-tier containers remain the React **Web Frontend**, Node.js/Express **Application Backend**, and **MySQL Relational Database**. People use the frontend over HTTPS; it sends JSON API requests to the backend over HTTPS. The backend reads and writes the database using SQL and initiates daily MySQL backup exports. It sends registration/verification and application status emails to the external **Email Service** via SMTP/HTTPS. It uploads automated daily backup exports to external **Cloud Backup Storage** via HTTPS. The external storage is configured for a minimum 30-day retention period and is part of the recovery design for the NFR-07 four-hour objective. No browser-to-database or browser-to-external-service connection is shown.
 
-## C4 Level 3 â€” Component
+## C4 Level 3 Component
 
 ![C4 Level 3 Backend Components](../uml/rendered/component.png)
 
