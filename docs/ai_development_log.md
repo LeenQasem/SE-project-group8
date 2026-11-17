@@ -1,20 +1,10 @@
-# AI Development Log
+﻿# AI Development Log
 
-Record iterative progress, decisions, and AI-assisted development notes here.
+| Version | Agent | Task / Prompt Ref. | Changed Modules | Issues / Corrections | Student Review |
+|---|---|---|---|---|---|
+| v0.4.0-design | Codex | Requirements and system architecture — [step4_architecture.md](../prompts/step4_architecture.md) | Requirements, architecture, C4 context/container/component views, traceability, report, README | Added external email and cloud backup systems; linked email to FR-01 / FR-12 and NFR-03, and backup/restore to NFR-06 / NFR-07. Preserved numbered requirements and recorded dependencies. | [Reviewed by Team Member] |
+| v0.4.1-design | Codex | System Architecture + External Systems — [step4_architecture.md](../prompts/step4_architecture.md) | Architecture documentation, C4 diagrams, requirements dependency note, traceability, report, README | Added Email Service and Cloud Backup Storage to C4 Levels; documented daily offsite backups, 30-day retention, and recovery support without claiming implementation. | [Reviewed by Team Member] |
+| v0.4.2-design | Codex | Deployment View — [step4_architecture.md](../prompts/step4_architecture.md) | Deployment diagram, architecture, traceability, report | Added vendor-neutral browser, scalable application, private database, email, and backup nodes; linked choices to relevant NFRs. | [Reviewed by Team Member] |
+| v0.5.0-design | Codex | UML Class Diagram — [step5_class_diagram.md](../prompts/step5_class_diagram.md) | UML class model | Corrected the modeling note to state Attendance is associated with Volunteer and Event; documented assumptions and retained the organizer recording association in the model. | [Reviewed by Team Member] |
+| v0.6.0-plan | Codex | Incremental Development Plan (no dedicated prompt record; nearest existing prompt: [step5_class_diagram.md](../prompts/step5_class_diagram.md)) | Incremental development plan | Plan outline is present in `docs/incremental_development_plan.md`; no separate prompt record for this milestone exists in `/prompts/`. | [Reviewed by Team Member] |
 
-## Step 4 Ã¢â‚¬â€ System Architecture
-
-- Documented the React / Node.js-Express / MySQL three-tier client-server architecture and C4 Levels in `docs/architecture.md`.
-- Added editable PlantUML diagram sources under `uml/` and rendered diagram artifacts under `uml/rendered/`.
-- Recorded the request, source inputs, and architecture decisions in `prompts/step4_architecture.md`.
-- Kept the work limited to documentation and diagrams; no application code was written.
-## Step 4 architecture integration update
-
-- Added Email Service and Cloud Backup Storage to C4 Levels, architecture documentation, and rendered diagrams.
-- Mapped email workflows to FR-01 / FR-12 and NFR-03; mapped daily offsite backup, retention, and restore support to NFR-06 / NFR-07 without changing numbered requirements.
-- Updated the requirements dependency note, prompt record, traceability matrix, report, and README summary. No application code was written.
-## Section 5.1 — Deployment View
-
-- Added a vendor-neutral C4 Deployment View showing browser, horizontally scalable application, private database, and external email/backup infrastructure nodes.
-- Linked node and connection choices to NFR-06, NFR-07, NFR-10, NFR-12, NFR-15, NFR-16, NFR-21, NFR-30, and NFR-31; updated architecture, traceability, report, and Step 4 prompt references.
-- Kept provider selection and implementation out of scope.
