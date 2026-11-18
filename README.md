@@ -34,9 +34,6 @@ Name: Layan Abu Salah            StudentId: 20241108
 
 ## 10.5 Incremental Development
 
-See [the incremental development plan](docs/incremental_development_plan.md) for the four versioned increments, design and working checkpoints, acceptance criteria, and release process.
-
-
 ---
 
 ## 10.6 Contributions
