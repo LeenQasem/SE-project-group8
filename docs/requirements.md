@@ -4,42 +4,204 @@
 
 ### 1.1 User Management
 
-- **FR-01:** The system shall allow users to create an account.
-- **FR-02:** The system shall allow registered users to log in and log out.
-- **FR-03:** The system shall support three user roles: Administrator, Event Organizer, and Volunteer.
-- **FR-04:** The system shall restrict access to system features based on the user's role.
+**FR-01: Create a User Account**
+
+- **Description:** The system shall allow users to create an account.
+- **Input:** Name, email, and password.
+- **Process:** The system validates the registration information, checks whether the email is already registered, and saves the new account.
+- **Output:** Account creation confirmation.
+- **Constraints:** Email must be valid and unique. Passwords must not be stored in plain text.
+- **Priority:** High.
+
+**FR-02: User Login and Logout**
+
+- **Description:** The system shall allow registered users to log in and log out.
+- **Input:** Email, password, and logout action.
+- **Process:** The system verifies the user's credentials and creates or ends the user session.
+- **Output:** Login or logout confirmation.
+- **Constraints:** Only registered users with valid credentials can log in. Protected features require authentication.
+- **Priority:** High.
+
+**FR-03: User Roles Management**
+
+- **Description:** The system shall support three user roles: Administrator, Event Organizer, and Volunteer.
+- **Input:** User role information.
+- **Process:** The system assigns and stores the appropriate role for each user.
+- **Output:** User account with an assigned role.
+- **Constraints:** Each user must have one of the three defined roles.
+- **Priority:** High.
+
+**FR-04: Role-Based Access Control**
+
+- **Description:** The system shall restrict access to features based on the user's role.
+- **Input:** Authenticated user role and requested feature.
+- **Process:** The system checks whether the user's role has permission to access the requested feature.
+- **Output:** Access granted or denied.
+- **Constraints:** Users can only access features permitted for their roles.
+- **Priority:** High.
 
 ### 1.2 Event Management
 
-- **FR-05:** The system shall allow Event Organizers to create new events.
-- **FR-06:** The system shall allow Event Organizers to edit or cancel their events.
-- **FR-07:** The system shall allow volunteers to browse available events.
-- **FR-08:** The system shall allow volunteers to search for events.
-- **FR-09:** The system shall display event details, including its title, description, date, location, and required number of volunteers.
+**FR-05: Create Events**
+
+- **Description:** The system shall allow Event Organizers to create events.
+- **Input:** Event title, description, date, location, and required volunteer capacity.
+- **Process:** The system validates the event information and saves the new event.
+- **Output:** New event record and creation confirmation.
+- **Constraints:** Only Event Organizers can create events. Capacity must be a positive whole number.
+- **Priority:** High.
+
+**FR-06: Edit and Cancel Events**
+
+- **Description:** The system shall allow Event Organizers to edit or cancel their events.
+- **Input:** Event ID, updated event information, or cancellation action.
+- **Process:** The system verifies event ownership and updates or cancels the selected event.
+- **Output:** Updated event details or cancellation confirmation.
+- **Constraints:** Organizers can only modify their own events. Cancelled events cannot accept new applications.
+- **Priority:** High.
+
+**FR-07: Browse Events**
+
+- **Description:** The system shall allow volunteers to browse available events.
+- **Input:** Optional browsing criteria.
+- **Process:** The system retrieves events that are open for applications and have available volunteer capacity.
+- **Output:** List of available events.
+- **Constraints:** Cancelled and fully staffed events are excluded.
+- **Priority:** High.
+
+**FR-08: Search Events**
+
+- **Description:** The system shall allow volunteers to search for events.
+- **Input:** Search text and optional date or location filters.
+- **Process:** The system searches event titles, descriptions, dates, and locations based on the entered criteria.
+- **Output:** List of matching events.
+- **Constraints:** Cancelled and fully staffed events are excluded from search results.
+- **Priority:** Medium.
+
+**FR-09: View Event Details**
+
+- **Description:** The system shall display detailed information about selected events.
+- **Input:** Event ID.
+- **Process:** The system retrieves and displays the selected event information.
+- **Output:** Event title, description, date, location, required volunteer capacity, and event status.
+- **Constraints:** Only valid event IDs return event details.
+- **Priority:** High.
 
 ### 1.3 Volunteer Applications
 
-- **FR-10:** The system shall allow volunteers to apply for available events.
-- **FR-11:** The system shall allow Event Organizers to view applications submitted for their events.
-- **FR-12:** The system shall allow Event Organizers to approve or reject volunteer applications.
-- **FR-13:** The system shall allow volunteers to view the status of their applications.
+**FR-10: Apply for Events**
+
+- **Description:** The system shall allow volunteers to apply for available events.
+- **Input:** Volunteer ID and event ID.
+- **Process:** The system checks event availability and whether the volunteer has already applied, then saves the application.
+- **Output:** Application confirmation and Pending status.
+- **Constraints:** Only volunteers can apply. Duplicate applications are not allowed. Events must not be cancelled or full.
+- **Priority:** High.
+
+**FR-11: View Event Applications**
+
+- **Description:** The system shall allow Event Organizers to view applications submitted for their events.
+- **Input:** Organizer ID and event ID.
+- **Process:** The system retrieves applications associated with the organizer's events.
+- **Output:** List of volunteer applications and their statuses.
+- **Constraints:** Organizers can only view applications for their own events.
+- **Priority:** High.
+
+**FR-12: Approve or Reject Applications**
+
+- **Description:** The system shall allow Event Organizers to approve or reject volunteer applications.
+- **Input:** Application ID and approval or rejection decision.
+- **Process:** The system verifies event ownership, checks the application status and available capacity, and updates the application status.
+- **Output:** Updated application status.
+- **Constraints:** Approved volunteers must not exceed the event's required capacity.
+- **Priority:** High.
+
+**FR-13: View Application Status**
+
+- **Description:** The system shall allow volunteers to view the status of their applications.
+- **Input:** Volunteer account ID.
+- **Process:** The system retrieves applications submitted by the volunteer and their current statuses.
+- **Output:** List of applications with Pending, Approved, or Rejected statuses.
+- **Constraints:** Volunteers can only view their own applications.
+- **Priority:** High.
 
 ### 1.4 Task Assignment
 
-- **FR-14:** The system shall allow Event Organizers to assign tasks and responsibilities to approved volunteers.
-- **FR-15:** The system shall allow volunteers to view their assigned tasks.
+**FR-14: Assign Tasks to Volunteers**
+
+- **Description:** The system shall allow Event Organizers to assign tasks and responsibilities to approved volunteers.
+- **Input:** Event ID, volunteer ID, task name, and task description.
+- **Process:** The system verifies the volunteer's approval for the event and saves the task assignment.
+- **Output:** Task assignment confirmation and details.
+- **Constraints:** Only approved volunteers can receive tasks for the relevant event.
+- **Priority:** High.
+
+**FR-15: View Assigned Tasks**
+
+- **Description:** The system shall allow volunteers to view their assigned tasks.
+- **Input:** Volunteer account ID.
+- **Process:** The system retrieves tasks assigned to the volunteer.
+- **Output:** List of assigned tasks and their details.
+- **Constraints:** Volunteers can only view their own assigned tasks.
+- **Priority:** High.
 
 ### 1.5 Attendance and Volunteer Hours
 
-- **FR-16:** The system shall allow Event Organizers to record volunteer attendance for their events.
-- **FR-17:** The system shall calculate volunteer participation hours based on recorded attendance.
-- **FR-18:** The system shall allow volunteers to view their attendance records and total volunteer hours.
+**FR-16: Record Volunteer Attendance**
+
+- **Description:** The system shall allow Event Organizers to record volunteer attendance manually.
+- **Input:** Event ID, volunteer ID, and attendance status.
+- **Process:** The system verifies the event and volunteer information, then saves the attendance record.
+- **Output:** Saved attendance record and confirmation.
+- **Constraints:** Only authorized organizers can record attendance for their own events.
+- **Priority:** High.
+
+**FR-17: Calculate Volunteer Hours**
+
+- **Description:** The system shall calculate volunteer participation hours based on recorded attendance and entered hours.
+- **Input:** Volunteer attendance records and manually entered hours.
+- **Process:** The system stores the hours entered by the organizer and calculates the volunteer's total hours across events.
+- **Output:** Updated total volunteer hours.
+- **Constraints:** Hours must be non-negative. Only valid recorded hours are included.
+- **Priority:** High.
+
+**FR-18: View Attendance Records and Total Hours**
+
+- **Description:** The system shall allow volunteers to view their attendance records and total volunteer hours.
+- **Input:** Volunteer account ID.
+- **Process:** The system retrieves the volunteer's attendance records and total recorded hours.
+- **Output:** Attendance history and total volunteer hours.
+- **Constraints:** Volunteers can only view their own attendance records and hours.
+- **Priority:** High.
 
 ### 1.6 Reports and Administration
 
-- **FR-19:** The system shall allow Event Organizers to view participation statistics for their events.
-- **FR-20:** The system shall allow Administrators to manage user accounts.
-- **FR-21:** The system shall allow Administrators to view overall platform statistics.
+**FR-19: View Event Participation Statistics**
+
+- **Description:** The system shall allow Event Organizers to view participation statistics for their events.
+- **Input:** Organizer ID and event ID.
+- **Process:** The system calculates participation statistics using application and attendance records.
+- **Output:** Event participation statistics, including application counts, attendance counts, and volunteer hours.
+- **Constraints:** Organizers can only view statistics for their own events.
+- **Priority:** Medium.
+
+**FR-20: Manage User Accounts**
+
+- **Description:** The system shall allow Administrators to manage user accounts.
+- **Input:** User ID and account information or management action.
+- **Process:** The system verifies administrator authorization and updates the selected user account.
+- **Output:** Updated user account information and confirmation.
+- **Constraints:** Only Administrators can manage user accounts.
+- **Priority:** High.
+
+**FR-21: View Overall Platform Statistics**
+
+- **Description:** The system shall allow Administrators to view overall platform statistics.
+- **Input:** Platform data and optional date filters.
+- **Process:** The system aggregates user, event, application, and volunteer-hours data.
+- **Output:** Overall platform statistics and summaries.
+- **Constraints:** Only Administrators can access platform-wide statistics.
+- **Priority:** Medium.
 
 ## 2. Non-Functional Requirements
 
