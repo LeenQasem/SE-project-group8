@@ -1,0 +1,64 @@
+# Increment 1 Authentication and User Management Activity Diagram: Prompt Record
+
+## Section 3.3 Metadata
+
+- **Version / Increment:** v0.1.0-design — Increment 1: Authentication and User Management
+- **Agent Name:** Codex
+- **Goal:** Create, render, and validate a PlantUML Activity Diagram for the first increment's authentication and user management workflows.
+- **Relevant Requirements & UML/Documentation References:** FR-01, FR-02, FR-03, FR-04, FR-20; NFR-10, NFR-12, NFR-14; `docs/requirements.md`; `docs/incremental_development_plan.md`; `docs/architecture.md`; `uml/class_diagram.puml`; `uml/component.puml`.
+- **Key Instructions Sent to Agent:** Use requirements and project documentation as the authority; show public volunteer registration, email verification, secure password hashing, login and retry, role-based paths for all three roles, administrator account management, authorization failures, security event logging, logout, and requested session expiration. Do not let public registration assign Administrator or Event Organizer roles. Do not expand account-management operations or include later-increment features. Render and inspect the diagram before creating this prompt record.
+- **Intended Outputs:** Editable PlantUML source; rendered SVG and PNG; this prompt record.
+- **Acceptance Criteria:** The PlantUML source renders successfully as both SVG and PNG. The exported image is visually inspected for readability. Registration, authentication, role access, administrator user management, logout, timeout handling, alternative/error flows, and applicable requirements are represented without unsupported later-increment behavior. The prompt accurately records the actual task and output paths.
+- **Links to Results:** `uml/increment_1_authentication_user_management_activity.puml`; `uml/rendered/increment_1_authentication_user_management_activity.svg`; `uml/rendered/increment_1_authentication_user_management_activity.png`.
+
+## User request
+
+Create a professionally organized UML Activity Diagram for Authentication and User Management in the Event & Volunteer Management System, aligned with the `v0.1.0-design` checkpoint. Use swimlanes for the User, System, and External Email Service. Include decision outcomes, error paths, role-based branches, and clear flow from registration or login through account/session outcomes.
+
+## Project and increment context
+
+The project is a web-based Event & Volunteer Management System. Increment 1 establishes account creation, login/logout, the Administrator, Event Organizer, and Volunteer roles, role-based access, and administrator management of user accounts. The established architecture includes an external Email Service for registration/verification messages. This is a design artifact; do not implement application code or imply that the workflows are implemented.
+
+## Authoritative inputs
+
+1. `docs/requirements.md` is the source of truth for requirement identifiers and wording.
+2. `docs/incremental_development_plan.md` defines Increment 1 scope and the `v0.1.0-design` checkpoint.
+3. `docs/architecture.md` and `uml/component.puml` describe the external Email Service dependency.
+4. Existing UML files under `uml/` and prompt records under `prompts/` define repository naming and style conventions.
+
+## Detailed task scope
+
+- **Volunteer registration:** Show the volunteer opening the registration page and entering information; system validation and duplicate-email checking; errors for invalid information or an already registered email; volunteer role assignment only; salted one-way password hashing; an account verification request to the external Email Service; completion of verification; account creation and security event logging.
+- **Authentication:** Show the login page and credential entry, credential validation, failed-login logging and error feedback with an opportunity to retry, and successful authenticated session establishment and role identification.
+- **Role access:** Provide distinct Administrator, Event Organizer, and Volunteer paths with their respective dashboards and only their first-increment role permissions. Show role authorization for protected operations and denial/logging on unauthorized access.
+- **Administrator account management:** Show an authorized Administrator managing user accounts under FR-20. Do not invent detailed management operations.
+- **Session end:** Show user-selected logout, session termination, security event logging, and return to the login page. Also show automatic configured session expiration, rejection of protected requests after expiry, user feedback, and return to login.
+
+## Key instructions and constraints
+
+- Keep the diagram readable and logically grouped, using PlantUML activity syntax, initial/final nodes, swimlanes, decisions, merges, and labeled flows.
+- Do not permit public users to choose Administrator or Event Organizer roles; organizer accounts are managed through administrator functionality.
+- Do not add event, application, assignment, attendance, reporting, or other later-increment workflows.
+- Avoid unsupported detail in user account management.
+- Preserve existing files; use the requested filenames where available and do not overwrite an existing artifact.
+- Render both required formats and inspect the PNG before writing this prompt record.
+- Do not claim successful validation without actual rendering and visual inspection. Do not commit or push changes.
+
+## Requirement references and traceability note
+
+- **FR-01:** Account creation.
+- **FR-02:** Login and logout.
+- **FR-03:** Administrator, Event Organizer, and Volunteer roles.
+- **FR-04:** Role-based feature access.
+- **FR-20:** Administrator user-account management.
+- **NFR-10:** Salted, one-way password hashing (as numbered in `docs/requirements.md`).
+- **NFR-12:** Role-based authorization for protected operations (as numbered in `docs/requirements.md`).
+- **NFR-14:** Security-relevant event logging (as numbered in `docs/requirements.md`).
+- The task also requests configurable session expiration and expired-session handling. The current `docs/requirements.md` does not define session expiration: its NFR-17 concerns consistent navigation, and NFR-19 concerns modular architecture. The diagram shows timeout handling because it is explicit in the task, but its requirement identifier and normative status need team reconciliation. Do not cite the requested timeout behavior as NFR-17 without updating the authoritative requirements.
+
+## Expected output paths
+
+- `uml/increment_1_authentication_user_management_activity.puml`
+- `uml/rendered/increment_1_authentication_user_management_activity.svg`
+- `uml/rendered/increment_1_authentication_user_management_activity.png`
+- `prompts/v0.1.0-design-authentication-user-management-activity-diagram.md`

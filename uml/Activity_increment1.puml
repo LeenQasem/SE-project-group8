@@ -1,0 +1,133 @@
+@startuml Increment1AuthenticationUserManagementActivity
+title Increment 1: Authentication and User Management
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F5F8FC
+  BorderColor #36536F
+  FontColor #172B3A
+  DiamondBackgroundColor #FFF3D6
+  DiamondBorderColor #A87516
+  StartColor #2E7D5B
+  EndColor #9A3E3E
+  BarColor #36536F
+}
+skinparam ArrowColor #496579
+skinparam ArrowThickness 1.2
+skinparam defaultFontName Arial
+skinparam activityFontSize 13
+skinparam activityDiamondFontSize 12
+
+legend right
+  First increment: account registration, authentication,
+  role-based access and administrator account management.
+  Session timeout is shown as requested; its requirement ID
+  needs reconciliation with docs/requirements.md.
+endlegend
+
+start
+partition "User" {
+  :Open system;
+}
+partition "System" {
+  if (Choose workflow) then (Register)
+    partition "User" {
+      :Open registration page;
+      :Enter registration information;
+    }
+    partition "System" {
+      :Validate submitted information;
+      if (Information valid?) then (No)
+        :Show field validation errors;
+        stop
+      else (Yes)
+        :Check whether email is registered;
+        if (Email already registered?) then (Yes)
+          :Show duplicate email error;
+          stop
+        else (No)
+          :Assign Volunteer role;
+          :Hash password with salted,
+          one-way algorithm;
+        endif
+      endif
+    }
+    partition "External Email Service" {
+      :Send account verification request;
+    }
+    partition "User" {
+      :Complete email verification;
+    }
+    partition "System" {
+      :Create verified account;
+      :Record account creation event;
+      :Show login page;
+      stop
+    }
+  else (Log in)
+    partition "User" {
+      :Open login page;
+      :Enter email and password;
+    }
+    partition "System" {
+      :Validate credentials;
+      if (Credentials valid?) then (No)
+        :Record failed login event;
+        :Show login error;
+        if (Retry login?) then (Yes)
+          partition "User" {
+            :Re-enter email and password;
+          }
+          partition "System" {
+            :Validate credentials;
+          }
+        else (No)
+          stop
+        endif
+      else (Yes)
+      endif
+      if (Credentials valid?) then (Yes)
+        :Establish authenticated session;
+        :Identify assigned role;
+        :Record successful login event;
+        if (Role?) then (Administrator)
+          :Open Administrator Dashboard;
+          :Authorize user management access;
+          if (Authorized?) then (Yes)
+            :Manage user accounts;
+            :Record administrative action;
+          else (No)
+            :Record authorization failure;
+            :Show access denied message;
+          endif
+        elseif (Event Organizer)
+          :Open Event Organizer Dashboard;
+          :Allow only first-increment
+          organizer-role permissions;
+        else (Volunteer)
+          :Open Volunteer Dashboard;
+          :Allow only first-increment
+          volunteer-role permissions;
+        endif
+        if (Session ends?) then (User selects logout)
+          :Terminate session;
+          :Record logout event;
+          :Return user to login page;
+          stop
+        else (Configured timeout expires)
+          :Expire and terminate session;
+          :Record session expiration event;
+          :Reject protected request;
+          :Show session expired message;
+          :Return user to login page;
+          stop
+        endif
+      else (No - retry failed)
+        :Show login error;
+        stop
+      endif
+    }
+  endif
+}
+@enduml

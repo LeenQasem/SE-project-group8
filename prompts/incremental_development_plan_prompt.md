@@ -6,7 +6,7 @@ Prepare or revise `docs/incremental_development_plan.md` for the Event & Volunte
 
 ## Role
 
-Act as a careful software project planner. Use precise, professional language and preserve the project's terminology, established decisions, and documentation style.
+Act as a careful software project planner. Use precise, professional language and preserve the project's terminology, established decisions, and documentation style. 
 
 ## Authoritative sources
 
