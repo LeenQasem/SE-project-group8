@@ -8,3 +8,5 @@
 | v0.5.0-design | Codex | UML Class Diagram — [step5_class_diagram.md](../prompts/step5_class_diagram.md) | UML class model | Corrected the modeling note to state Attendance is associated with Volunteer and Event; documented assumptions and retained the organizer recording association in the model. | [Reviewed by Team Member] |
 | v0.6.0-plan | Codex | Incremental Development Plan (no dedicated prompt record; nearest existing prompt: [step5_class_diagram.md](../prompts/step5_class_diagram.md)) | Incremental development plan | Plan outline is present in `docs/incremental_development_plan.md`; no separate prompt record for this milestone exists in `/prompts/`. | [Reviewed by Team Member] |
 
+| v0.1.0-design | Codex | Increment 1 Class Diagram — [class_diagram_increment1_prompt.md](../prompts/class_diagram_increment1_prompt.md) | Increment 1 UML class design | Aligned the scoped class model with the ERD; omitted unsupported account-status and session-persistence details. Rendering was unavailable (PlantUML/Java/image renderer absent). | Pending team review |
+
