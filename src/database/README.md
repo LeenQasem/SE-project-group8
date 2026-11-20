@@ -20,14 +20,30 @@ Install MySQL Server and its command-line client (8.0.16+). Create a database us
 CREATE DATABASE evms CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 ```
 
-From a shell whose input redirection is supported, apply the schema, then seed the role reference rows:
+Apply the schema, then seed the role reference rows (from the repository root; these paths reflect the current `src/database/` layout):
 
 ```sh
-mysql -u <database-user> -p evms < database/schema.sql
-mysql -u <database-user> -p evms < database/seed.sql
+mysql -u <database-user> -p evms < src/database/schema.sql
+mysql -u <database-user> -p evms < src/database/seed.sql
 ```
 
 The schema uses `CREATE TABLE IF NOT EXISTS`; the role seed is safe to run repeatedly. The script does not create database accounts or embed credentials. Configure a least-privilege application database account and its connection settings in the future backend's environment configuration; never commit real credentials.
+
+### Verify seed idempotency
+
+Keep this check separate from the smoke test because it deliberately runs the seed script multiple times. Use a fresh, disposable database so the result is isolated:
+
+```sh
+mysql -u <test-database-user> -p -e "CREATE DATABASE evms_seed_test CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+mysql -u <test-database-user> -p evms_seed_test < src/database/schema.sql
+mysql -u <test-database-user> -p evms_seed_test < src/database/seed.sql
+mysql -u <test-database-user> -p evms_seed_test -e "SELECT COUNT(*) AS role_count FROM Role; SELECT role_name, COUNT(*) AS copies FROM Role GROUP BY role_name;"
+mysql -u <test-database-user> -p evms_seed_test < src/database/seed.sql
+mysql -u <test-database-user> -p evms_seed_test < src/database/seed.sql
+mysql -u <test-database-user> -p evms_seed_test -e "SELECT COUNT(*) AS role_count FROM Role; SELECT role_name, COUNT(*) AS copies FROM Role GROUP BY role_name;"
+```
+
+Both query results should show three total roles and one row per role name. Repeat the first query before rerunning the seed to capture the baseline, then compare it with the final result. This verifies that repeated seed execution does not duplicate role rows; it does not modify the seed script or add sample users.
 
 ## Sample data
 
@@ -42,10 +58,10 @@ The schema uses `CREATE TABLE IF NOT EXISTS`; the role seed is safe to run repea
 After applying schema and seed to a **disposable test database**, run:
 
 ```sh
-mysql -u <test-database-user> -p evms_test < database/tests/increment_1_smoke.sql
+mysql -u <test-database-user> -p evms_test < src/database/tests/increment_1_smoke.sql
 ```
 
-The smoke script checks role seed and table presence. Its comments list additional negative constraint checks to perform manually. This repository has no MySQL client or server available in the current environment, so SQL execution, CRUD behavior, constraint failures, and reconnect persistence have not been verified here. Run those checks against a local MySQL instance before treating the database as runtime-validated. The test script creates and drops a temporary stored procedure, so run it only in a disposable test database.
+The smoke script asserts the required Increment 1 columns and their types without prohibiting additional columns, so later approved increments can extend the tables. It also checks keys, unique indexes, the role foreign key, seeded roles, and required NOT NULL restrictions. It performs user create/read/update/delete checks and verifies expected MySQL error codes for duplicate keys/emails/roles (1062), NULL required values (1048), invalid role values (3819), unknown role references (1452), and deletion of a referenced role (1451). Unexpected errors fail the test. Test data is rolled back. Reconnect persistence is not covered by this single-session script. Run it only in a disposable test database; it creates and drops a stored procedure. This repository has no MySQL client or server available in the current environment, so SQL execution has not been verified here.
 
 ## Future increments
 

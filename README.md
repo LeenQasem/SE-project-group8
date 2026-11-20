@@ -35,7 +35,7 @@ src/database/
 ├── seed.sql                  # Three role reference records
 ├── operations.sql            # Parameterized SQL examples for user management
 └── tests/
-    └── increment_1_smoke.sql # Schema and role-seed smoke check
+    └── increment_1_smoke.sql # Schema, CRUD, and integrity smoke tests
 ```
 
 ## 10.4.1 Database (Increment 1)
@@ -67,7 +67,7 @@ Get-Content -Raw src/database/seed.sql | mysql -u root -p evms_test
 Get-Content -Raw src/database/tests/increment_1_smoke.sql | mysql -u root -p evms_test
 ```
 
-The smoke script verifies that the two tables exist and the three role rows are seeded. It requires permission to create and drop a stored procedure. Additional constraint checks are listed as manual checks in the SQL script; CRUD behavior and persistence across reconnects are not covered by automated tests. A MySQL server/client is required to execute these commands.
+The smoke script checks table and column definitions, keys, role seed data, and referential integrity. It exercises user create/read/update/delete behavior and verifies that invalid or duplicate values are rejected; its test data is rolled back. It requires permission to create and drop a stored procedure. Persistence across reconnects is not covered. A MySQL server/client is required to execute these commands.
 
 See the [database-specific documentation](src/database/README.md) for schema details, data-operation guidance, limitations, and future-increment notes.
 
