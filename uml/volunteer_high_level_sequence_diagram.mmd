@@ -1,0 +1,14 @@
+%% Volunteer High-Level Sequence Diagram-Apply for Events
+sequenceDiagram
+    actor Volunteer
+    participant System as Event Management System
+
+    Volunteer->>System: Browse available events
+    System-->>Volunteer: Display available events
+    Volunteer->>System: Select an event and submit application
+    System->>System: Validate application and event availability
+    alt Application is valid and event is available
+        System-->>Volunteer: Confirm application submission (Pending)
+    else Application cannot be submitted
+        System-->>Volunteer: Display rejection message
+    end
