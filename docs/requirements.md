@@ -218,7 +218,7 @@
 
 ### 2.3 Scalability and Capacity
 
-- **NFR-6:** NFR-10: The system shall support at least 500 concurrent active users while meeting performance requirements.
+- **NFR-6:** The system shall support at least 500 concurrent active users while meeting performance requirements.
 - **NFR-7:** The system shall support at least 10,000 registered users, 5,000 events, and 100,000 volunteer applications without requiring changes to core functionality.
 - **NFR-8:** The system architecture shall allow application servers and background-processing capacity to be scaled horizontally as user traffic and stored data increase.
 - **NFR-9:** The system shall support event registration capacity limits and shall prevent registrations from exceeding the number of volunteers required for an event unless an authorized Event Organizer explicitly changes the limit.
