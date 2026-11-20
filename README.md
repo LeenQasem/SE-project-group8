@@ -27,14 +27,56 @@ Name: Layan Abu Salah            StudentId: 20241108
 ---
 
 ## 10.4 Repository Structure
-* `/database` Stores database schema definitions, migration scripts, and initial seed data.
+
+```text
+src/database/
+├── README.md                 # Database scope, setup, and verification notes
+├── schema.sql                # Increment 1 MySQL Role and User tables
+├── seed.sql                  # Three role reference records
+├── operations.sql            # Parameterized SQL examples for user management
+└── tests/
+    └── increment_1_smoke.sql # Schema and role-seed smoke check
+```
+
+## 10.4.1 Database (Increment 1)
+
+The project documentation selects **MySQL**. The current database implementation targets MySQL 8.0.16 or newer with InnoDB; it uses plain SQL scripts, with no ORM or application database driver currently included. The initial schema supports Increment 1 authentication and user management through two tables: `Role` and `User`. Each user has one required role. Primary and foreign keys, unique role names and emails, required fields, role-value checks, and restricted role deletion protect data integrity.
+
+The role seed inserts Administrator, Event Organizer, and Volunteer. The registration SQL example assigns Volunteer. No user accounts or passwords are seeded. The database stores a `password_hash`; password hashing, authentication, session handling, and role authorization require backend code, which is not yet present in this repository. Events, applications, tasks, attendance, and reports belong to later increments and are not in this schema.
+
+### Set up the database
+
+Install MySQL Server and the MySQL command-line client, version 8.0.16 or newer. In PowerShell, create the development database and load the schema and role seed:
+
+```powershell
+mysql -u root -p -e "CREATE DATABASE evms CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+Get-Content -Raw src/database/schema.sql | mysql -u root -p evms
+Get-Content -Raw src/database/seed.sql | mysql -u root -p evms
+```
+
+The SQL files do not require environment variables. The repository has no application connection configuration yet; do not commit database credentials when backend configuration is added. The schema can be reapplied with `CREATE TABLE IF NOT EXISTS`, and the role seed is repeatable.
+
+### Verify the database
+
+The existing smoke check requires a separate, disposable test database. Create and initialize it, then run the check:
+
+```powershell
+mysql -u root -p -e "CREATE DATABASE evms_test CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+Get-Content -Raw src/database/schema.sql | mysql -u root -p evms_test
+Get-Content -Raw src/database/seed.sql | mysql -u root -p evms_test
+Get-Content -Raw src/database/tests/increment_1_smoke.sql | mysql -u root -p evms_test
+```
+
+The smoke script verifies that the two tables exist and the three role rows are seeded. It requires permission to create and drop a stored procedure. Additional constraint checks are listed as manual checks in the SQL script; CRUD behavior and persistence across reconnects are not covered by automated tests. A MySQL server/client is required to execute these commands.
+
+See the [database-specific documentation](src/database/README.md) for schema details, data-operation guidance, limitations, and future-increment notes.
 
 
 ---
 
 ## 10.5 Incremental Development
 
-See [the incremental development plan](docs/incremental_development_plan.md) for the four versioned increments, design and working checkpoints, acceptance criteria, and release process.
+The project evolves as one system across four increments. The current database supports Increment 1; later increments are planned to extend this same database rather than create separate systems. Later-increment database features are not implemented yet. See [the incremental development plan](docs/incremental_development_plan.md) for the versioned increments, design and working checkpoints, acceptance criteria, and release process.
 
 ---
 
