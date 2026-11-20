@@ -16,6 +16,12 @@ The four increments follow the natural workflow of the system:
 3. Volunteer Applications and Assignments.
 4. Attendance, Hours Tracking and Reports.
 
+UML modeling will be completed within the existing design checkpoints, starting with the High-Level Use Case Diagram, followed by three High-Level Sequence Diagrams (one for each actor: Volunteer, Event Organizer, and Administrator), and then three Low-Level Sequence Diagrams.
+
+The Volunteer "Apply for Events" Low-Level Sequence Diagram is already completed and merged into main at `uml/sequence_diagram.mmd`. The remaining two Low-Level Sequence Diagrams will be prepared after the High-Level diagrams are completed and reviewed.
+
+These diagrams are design deliverables within the four existing increments, not additional increments.
+
 After completing all four increments, the team will integrate and validate the complete application before releasing version `v1.0.0`.
 
 ---
@@ -68,6 +74,7 @@ How will users register, log in and access the system according to their assigne
 
 **Deliverables:**
 - Authentication Activity Diagram.
+- Existing High-Level Use Case Diagram (`uml/use_case_diagram.puml`), retained as the starting point for sequence modeling.
 - Initial Entity Relationship Diagram.
 - User-role and permission specifications.
 - Updated requirements documentation.
@@ -141,17 +148,20 @@ How will organizers create and manage events, and how will volunteers discover a
 
 **Tools:**
 - PlantUML or draw.io.
+- Mermaid.
 - Database modeling tools.
 - Markdown documentation.
 - GitHub.
 
 **Deliverables:**
 - Event management workflow diagrams.
+- Three High-Level Sequence Diagrams, covering Volunteer, Event Organizer and Administrator interactions with the system.
 - Updated ERD.
 - Event management specifications.
 - Updated requirements documentation.
 
 **Acceptance criteria:**
+- All three High-Level Sequence Diagrams are completed and reviewed.
 - Event attributes are identified.
 - Event creation, editing and cancellation workflows are documented.
 - The relationship between organizers and events is defined.
@@ -221,6 +231,7 @@ How will volunteers apply to events, how will organizers process applications, a
 
 **Tools:**
 - PlantUML.
+- Mermaid.
 - Database modeling tools.
 - Markdown documentation.
 - GitHub.
@@ -228,11 +239,13 @@ How will volunteers apply to events, how will organizers process applications, a
 **Deliverables:**
 - Application workflow diagrams.
 - Assignment workflow diagrams.
+- Low-Level Sequence Diagram deliverables for Volunteer, Event Organizer and Administrator. The Volunteer “Apply for Events” diagram already exists at `uml/sequence_diagram.mmd`, is included as completed existing work and is not to be recreated or modified. Prepare the remaining two actor diagrams after all three High-Level Sequence Diagrams have been completed and reviewed.
 - Updated ERD.
 - Application status specifications.
 - Updated requirements documentation.
 
 **Acceptance criteria:**
+- All three Low-Level Sequence Diagrams are included in the design deliverables.
 - Application submission and review processes are documented.
 - Application statuses and their transitions are defined.
 - Event capacity rules are documented.
