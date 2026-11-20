@@ -1,0 +1,15 @@
+﻿@startuml SD02_High_Level_UC02_UserManagement
+title SD02 - High-Level Sequence Diagram: UC02 User Management & RBAC
+autonumber
+actor Administrator as Admin
+participant ":VolunteerManagementSystem" as System
+
+Admin -> System : viewUsers()
+activate System
+System --> Admin : List<User>
+deactivate System
+Admin -> System : assignRole(userId, role)
+activate System
+System --> Admin : User (updated role)
+deactivate System
+@enduml

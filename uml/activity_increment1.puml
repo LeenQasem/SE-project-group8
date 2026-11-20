@@ -1,0 +1,47 @@
+﻿@startuml activity_increment1
+title Increment 1 — Registration, Authentication and User Management
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF3FB
+  BorderColor #315A78
+}
+|User|
+start
+:Enter name, email and password;
+|System|
+:Validate and sanitize fields;
+:Check email format and uniqueness;
+if (Valid and email unique?) then (yes)
+  :Hash password with salted one-way algorithm;
+  :Assign VOLUNTEER role (ignore client role input);
+  :Persist user and session;
+  |User|
+  :Receive registration confirmation;
+  :Submit email and password to login;
+  |System|
+  :Verify password hash and ACTIVE status;
+  if (Credentials valid?) then (yes)
+    :Create persisted session;
+    :Return identity and role;
+    |User|
+    :Use protected feature;
+    |System|
+    :Validate session and authorize required role;
+    if (Authorized?) then (yes)
+      :Process permitted request;
+    else (no)
+      :Return safe access-denied response;
+    endif
+    |User|
+    :Request logout;
+    |System|
+    :Revoke session and persist revocation;
+    stop
+  else (no)
+    :Return generic login failure;
+    stop
+  endif
+else (no)
+  :Return safe field-level validation/duplicate error;
+  stop
+endif

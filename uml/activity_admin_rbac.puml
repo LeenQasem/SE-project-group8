@@ -1,0 +1,32 @@
+﻿@startuml activity_admin_rbac
+ title Increment 1 — Administrator Provisioning and Account Management
+ skinparam shadowing false
+|System|
+start
+:Secure operator starts one-time setup command;
+:Acquire database lock and verify no administrator exists;
+if (Secret valid and no admin exists?) then (yes)
+  :Create first Administrator transactionally;
+  :Consume one-time setup authorization;
+else (no)
+  :Stop and record security event;
+  stop
+endif
+|Administrator|
+:Log in and open user management;
+|System|
+:Validate active session and Administrator role;
+if (Authorized?) then (yes)
+  :List and display user accounts;
+  |Administrator|
+  :View account and submit permitted edits or role assignment;
+  |System|
+  :Validate fields and role enum;
+  :Persist update and write audit event;
+  :Return confirmation;
+  stop
+else (no)
+  :Return safe access-denied response and audit event;
+  stop
+endif
+@enduml

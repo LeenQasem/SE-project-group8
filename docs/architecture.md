@@ -1,69 +1,51 @@
-# System Architecture
+﻿# System Architecture — Increment 1 (v0.1.0)
 
-## Overview and architectural style
+## Scope and technology
 
-The Event & Volunteer Management System is a web-based, three-tier client-server application. A browser-based React frontend presents the system to Administrators, Event Organizers, and Volunteers. It communicates over HTTPS with a Node.js/Express backend, which applies authentication, role authorization, validation, and business rules. The backend accesses the MySQL database and integrates with two external systems: an Email Service and Cloud Backup Storage. The browser does not connect directly to MySQL or either external system.
+This repository describes the planned Event & Volunteer Management System. The project description selects a React browser client, Node.js/Express API, and MySQL database. This checkout currently contains design artifacts only; it has no application source, dependency manifest, migration, or executable test suite. Diagrams are design intent and do not claim implementation is complete.
 
-### Three tiers
+Increment 1 includes **UC01 User Account & Authentication**, **UC02 User Management & RBAC**, and persistence for `users` and `user_sessions`. UC03–UC07 (events, exploration/applications, task assignment, attendance/hours, and statistics) are deferred to Increment 2. The deferred actors remain shown where useful for system context, but their workflows and data are outside v0.1.0.
 
-1. **Presentation tier â€” React client:** Renders role-aware screens, gathers user input, and displays event listings/details, application status, assignments, attendance records, volunteer hours, and reports. It sends and receives JSON API requests over HTTPS.
-2. **Application tier â€” Node.js and Express server:** Exposes HTTP API routes, authenticates requests, enforces Administrator / Event Organizer / Volunteer permissions, validates input, and runs business logic. It coordinates user, event, application, assignment, attendance, reporting, email notification, and scheduled backup operations.
-3. **Data tier â€” MySQL database:** Stores persistent account and role data, events, volunteer applications and decisions, task assignments, attendance, and records used to calculate participation hours and statistics. The backend accesses it using SQL through a data-access boundary.
+## Logical layers
 
-The application backend is also the integration boundary for the external systems. It sends registration/verification and application status messages to the Email Service over SMTP/HTTPS. A scheduled backend process exports MySQL application data and uploads daily backups over HTTPS to offsite Cloud Backup Storage. Configure that storage for at least 30 days of retention; the backup and restoration procedure supports the NFR-07 four-hour recovery objective. NFR-03 explicitly excludes time waiting for external services. These are logical responsibilities; provider and credentials remain unselected. Deployment placement is documented in the vendor-neutral C4 Deployment View below.
+1. **Presentation / Boundary:** React UI calls `AuthController` and `AdminUserController` over HTTPS/JSON.
+2. **Application / Services:** `AuthService` handles registration, credential checks, session lifecycle; `UserManagementService` handles account listing/view/update and role changes; `AccessControlService` validates sessions and authorizes administrator operations.
+3. **Data Access:** `UserRepository` issues parameterized MySQL operations for users and sessions.
+4. **Domain:** `User`, `UserSession`, `UserRole`, and `AccountStatus` define account and session state.
 
-## C4 Level 1  System Context
+MySQL contains `users` and `user_sessions` tables. Email verification is an optional external integration. Daily backups and restore procedures target Cloud Backup Storage under NFR-02 and NFR-03; they are persistence/operations concerns and do not add later-increment business entities.
 
-![C4 Level 1 System Context](../uml/rendered/system_contex.png)
+## Registration, roles, and session policy
 
-The system boundary contains the Event & Volunteer Management System. Its human actors remain:
+Public registration accepts name, email, password. The backend validates and sanitizes fields, enforces valid unique email, hashes passwords with a salted one-way algorithm (NFR-10), and always sets role `VOLUNTEER`; any submitted role field is ignored. Passwords are never persisted in plaintext. Sessions store a token hash, expiry, and optional revocation timestamp.
 
-- **Volunteer:** discovers events, applies, and checks application decisions, assignments, attendance, and hours.
-- **Event Organizer:** manages events, reviews applications, assigns tasks, records attendance, and reviews event statistics.
-- **Administrator:** manages user accounts and reviews platform statistics.
+The first Administrator is provisioned manually through a guarded setup command, not a public API. The setup requires a protected one-time secret, refuses to proceed if an Administrator already exists, serializes concurrent attempts with a database lock/transaction, and consumes the one-time authorization. After bootstrap, only an authenticated Administrator may assign/change roles or update permitted account fields. Backend authorization is mandatory (FR-04, NFR-12). Public registration cannot create Administrator or Event Organizer accounts.
 
-Two external systems support the functional and operational requirements:
+The detailed provisioning secret-delivery mechanism remains a deployment decision and must be documented before implementation. Never log passwords, session tokens, or bootstrap secrets (NFR-14, NFR-20).
 
-- **Email Service:** receives email requests from the application for account registration/verification (FR-01) and volunteer application approval/rejection status (FR-12). The integration uses SMTP/HTTPS; NFR-03's completion time excludes waiting on this external service.
-- **Cloud Backup Storage:** receives automated daily MySQL backups over HTTPS for offsite retention. Its intended configuration retains backups for at least 30 days (NFR-06) and supports the four-hour restoration objective after a declared incident (NFR-07).
+## Persistence and security
 
-## C4 Level 2 Container
+`users.email` has a unique constraint; `users.role` is a required enum with exactly the three supported roles; user/session rows have primary keys and timestamps. `user_sessions.user_id` references `users.id`, and session token hashes are unique. Expired/revoked sessions cannot authenticate. Use HTTPS/TLS in transit, restricted database access and appropriate encryption/access controls at rest (NFR-11). Use parameterized SQL, generic login errors, field-level validation feedback, and security/audit events without secrets (NFR-05, NFR-13, NFR-14, NFR-18).
 
-![C4 Level 2 Container](../uml/rendered/container.png)
+NFR-01 supplies a login latency target; it requires measurement once implementation exists. Responsive behavior and common navigation are frontend requirements (NFR-16, NFR-17). Automated tests are required by NFR-21 but cannot be claimed until application code and tests exist.
 
-The three-tier containers remain the React **Web Frontend**, Node.js/Express **Application Backend**, and **MySQL Relational Database**. People use the frontend over HTTPS; it sends JSON API requests to the backend over HTTPS. The backend reads and writes the database using SQL and initiates daily MySQL backup exports. It sends registration/verification and application status emails to the external **Email Service** via SMTP/HTTPS. It uploads automated daily backup exports to external **Cloud Backup Storage** via HTTPS. The external storage is configured for a minimum 30-day retention period and is part of the recovery design for the NFR-07 four-hour objective. No browser-to-database or browser-to-external-service connection is shown.
+## Increment 2 boundary
 
-## C4 Level 3 Component
+`Event`, `Application`, `Task`, and `Attendance` and the UC03–UC07 services/repositories are deferred. They appear only as planned context; they are not part of the v0.1.0 persistence schema or implementation scope.
 
-![C4 Level 3 Backend Components](../uml/rendered/component.png)
+## Diagram sources and rendering
 
-The Level 3 view expands the Express backend into responsibility-focused components:
+Editable sources: `uml/use_case.puml`, `uml/class_diagram.puml`, `uml/sequence_diagram.mmd`, `uml/sequence_auth.mmd`, `uml/sequence_admin_rbac.mmd`, `uml/system_context.puml`, `uml/container.puml`, `uml/component.puml`, `uml/deployment.puml`, `uml/activity_increment1.puml`, `uml/activity_admin_rbac.puml`, and `uml/erd_increment1.puml`.
 
-- **API Routes** expose endpoints and dispatch incoming requests; **Authentication & Authorization** verifies identity and enforces roles.
-- **User Management**, **Event Management**, **Application Management**, **Task Assignment**, **Attendance & Hours**, and **Statistics & Reporting** implement the corresponding use cases and access the database through **Data Access**.
-- **Email Notifications** receives triggers from user registration/verification and application approval/rejection workflows, then sends messages to the external Email Service using SMTP/HTTPS. External-service waiting is excluded from NFR-03 timing.
-- **Scheduled Backup & Recovery** runs the daily MySQL export, uploads it to external Cloud Backup Storage using HTTPS, and supports the documented restore procedure. Configure offsite retention for at least 30 days; backup and recovery operations support NFR-06 and NFR-07.
+From the repository root, after installing Java and downloading `plantuml.jar` plus Mermaid CLI (`@mermaid-js/mermaid-cli`):
 
-Component boundaries and the scheduled process are logical design responsibilities, not claims that application code or external provider configuration already exists. Endpoint contracts, provider, schema, deployment, retention configuration, and restore runbook remain implementation/deployment decisions.
+```powershell
+New-Item -ItemType Directory -Force uml/rendered | Out-Null
+java -jar plantuml.jar -tpng -o rendered uml/use_case.puml uml/class_diagram.puml uml/system_context.puml uml/container.puml uml/component.puml uml/deployment.puml uml/activity_increment1.puml uml/activity_admin_rbac.puml uml/erd_increment1.puml
+npx mmdc -i uml/sequence_diagram.mmd -o uml/rendered/sequence-diagram.png
+npx mmdc -i uml/sequence_auth.mmd -o uml/rendered/sequence_auth.png
+npx mmdc -i uml/sequence_admin_rbac.mmd -o uml/rendered/sequence_admin_rbac.png
+```
 
+PlantUML C4 sources use the C4-PlantUML standard library include URL and therefore need network access when the library is not cached. Output PNGs are design renders, not execution evidence.
 
-## C4 Deployment View
-
-![C4 Deployment View](../uml/rendered/deployment.png)
-
-This logical, vendor-neutral topology shows deployment placement because the requirements make scaling, network security, backup, and recovery decisions meaningful. It does not select a hosting vendor or prescribe machine sizes.
-
-- **Client Browser Node:** Runs the React frontend received from the application server over HTTPS/TLS. A responsive browser client supports NFR-21, and the supported-browser target is NFR-30; HTTPS/TLS supports NFR-15.
-- **Application Server Node (xN):** Serves the React frontend bundle and runs the Node.js/Express backend. Replicated instances provide a place to scale application capacity horizontally for at least 500 concurrent users (NFR-10, NFR-12). HTTPS/TLS protects browser traffic (NFR-15), and vendor-neutral deployment configuration supports portability (NFR-31).
-- **Database Server Node on a private network:** Runs MySQL with encrypted storage and backend-only SQL access. Network isolation and access restrictions support NFR-15 and NFR-16; a portable database/deployment configuration supports NFR-31.
-- **External Email Infrastructure:** The backend sends registration/verification and application-status messages to the Email Service using SMTP over TLS or HTTPS (FR-01, FR-12). External-service wait remains excluded from request timing under NFR-03.
-- **External Backup Infrastructure:** The backend uploads automated daily MySQL backups to Cloud Backup Storage over HTTPS. Configure at least 30-day retention to meet NFR-06; backups and a restoration procedure support the four-hour recovery objective in NFR-07.
-
-The diagram specifies logical nodes and links only. Provider selection, instance sizing, exact network implementation, backup encryption settings, and recovery runbook remain deployment configuration decisions.
-## Requirement alignment
-
-Email integration supports FR-01 and FR-12; NFR-03 excludes external-service wait time. Daily offsite backups with 30-day retention address NFR-06, while the restore procedure and stored backups support the NFR-07 four-hour recovery objective. A requirement mapping is recorded in `docs/traceability_matrix.md`.
-
-## Diagram sources
-
-Editable PlantUML sources: `uml/system_context.puml`, `uml/container.puml`, `uml/component.puml`, and `uml/deployment.puml`. Rendered PNGs: `uml/rendered/system_contex.png`, `uml/rendered/container.png`, `uml/rendered/component.png`, and `uml/rendered/deployment.png`.

@@ -1,0 +1,19 @@
+﻿@startuml SD01_High_Level_UC01_Auth
+title SD01 - High-Level Sequence Diagram: UC01 User Account & Authentication
+autonumber
+actor User
+participant ":VolunteerManagementSystem" as System
+
+User -> System : register(name, email, password)
+activate System
+System --> User : User (role = VOLUNTEER)
+deactivate System
+User -> System : login(email, password)
+activate System
+System --> User : Boolean (true)
+deactivate System
+User -> System : logout()
+activate System
+System --> User : void
+deactivate System
+@enduml
