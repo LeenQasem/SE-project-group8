@@ -1,24 +1,81 @@
-﻿@startuml SD04_Low_Level_UC02_UserManagement
+@startuml SD04_Low_Level_UC02_UserManagement
 title SD04 - Low-Level Sequence Diagram: UC02 User Management & RBAC
 autonumber
 actor Administrator as Admin
-participant ":AdminUserController" as AdminCtrl
-participant ":User" as U
+participant ":AdminUserController" as AdminController
+participant ":AccessControlService" as AccessControl
+participant ":UserManagementService" as UserManagement
+participant ":UserRepository" as UserRepository
+database "MySQL Database" as DB
 
-Admin -> AdminCtrl : viewUsers()
-activate AdminCtrl
-AdminCtrl -> U : getAllUsers()
-activate U
-U --> AdminCtrl : List<User>
-deactivate U
-AdminCtrl --> Admin : List<User>
-deactivate AdminCtrl
-Admin -> AdminCtrl : assignRole(userId, role)
-activate AdminCtrl
-AdminCtrl -> U : setRole(role: UserRole)
-activate U
-U --> AdminCtrl : User
-deactivate U
-AdminCtrl --> Admin : User
-deactivate AdminCtrl
+Admin -> AdminController : viewUsers(session)
+activate AdminController
+AdminController -> AccessControl : authorizeAdministrator(session)
+activate AccessControl
+AccessControl -> UserRepository : findActiveSession(session)
+activate UserRepository
+UserRepository -> DB : SELECT session and user role
+activate DB
+DB --> UserRepository : Session and role or no match
+deactivate DB
+UserRepository --> AccessControl : Session and role or no match
+deactivate UserRepository
+AccessControl --> AdminController : Authorized or denied
+deactivate AccessControl
+alt Session belongs to an Administrator
+    AdminController -> UserManagement : viewUsers()
+    activate UserManagement
+    UserManagement -> UserRepository : findAllUsers()
+    activate UserRepository
+    UserRepository -> DB : SELECT users
+    activate DB
+    DB --> UserRepository : User records
+    deactivate DB
+    UserRepository --> UserManagement : User list
+    deactivate UserRepository
+    UserManagement --> AdminController : User list
+    deactivate UserManagement
+    AdminController --> Admin : User list
+else Session is missing, expired, or not Administrator
+    AdminController --> Admin : Access denied
+end
+deactivate AdminController
+
+Admin -> AdminController : assignRole(session, userId, role)
+activate AdminController
+AdminController -> AccessControl : authorizeAdministrator(session)
+activate AccessControl
+AccessControl -> UserRepository : findActiveSession(session)
+activate UserRepository
+UserRepository -> DB : SELECT session and user role
+activate DB
+DB --> UserRepository : Session and role or no match
+deactivate DB
+UserRepository --> AccessControl : Session and role or no match
+deactivate UserRepository
+AccessControl --> AdminController : Authorized or denied
+deactivate AccessControl
+alt Session belongs to an Administrator
+    AdminController -> UserManagement : assignRole(userId, role)
+    activate UserManagement
+    UserManagement -> UserManagement : validate role and target user ID
+    alt Role is valid and target user exists
+        UserManagement -> UserRepository : updateRole(userId, role)
+        activate UserRepository
+        UserRepository -> DB : UPDATE user role
+        activate DB
+        DB --> UserRepository : Updated user record
+        deactivate DB
+        UserRepository --> UserManagement : User with updated role
+        deactivate UserRepository
+        UserManagement --> AdminController : Role updated
+    else Role is invalid or target user does not exist
+        UserManagement --> AdminController : Role assignment rejected
+    end
+    deactivate UserManagement
+    AdminController --> Admin : Role assignment result
+else Session is missing, expired, or not Administrator
+    AdminController --> Admin : Access denied
+end
+deactivate AdminController
 @enduml
