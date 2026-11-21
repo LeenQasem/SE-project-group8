@@ -1,10 +1,5 @@
 @startuml Increment1InitialERD
 title Event & Volunteer Management System - Increment 1 Initial ERD
-<<<<<<< HEAD
-=======
-@startuml TEMP_INCREMENT_1_ERD
-title Event & Volunteer Management System - Increment 1 ERD
->>>>>>> 0cc017c2376f947062050cdfe0404fc7debae6b6
 
 left to right direction
 skinparam backgroundColor #FFFFFF
@@ -35,8 +30,6 @@ entity "User" as USER {
 }
 
 ROLE ||--o{ USER : assigned to
-<<<<<<< HEAD
-=======
 entity "UserSession" as USER_SESSION {
   * session_id : BIGINT <<PK>>
   --
@@ -49,7 +42,6 @@ entity "UserSession" as USER_SESSION {
 
 ROLE ||--o{ USR : assigned to
 USR ||--o{ USER_SESSION : has
->>>>>>> 0cc017c2376f947062050cdfe0404fc7debae6b6
 
 note top of ROLE
   Seed roles: Administrator,
