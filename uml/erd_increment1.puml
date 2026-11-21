@@ -1,5 +1,5 @@
-@startuml Increment1InitialERD
-title Event & Volunteer Management System - Increment 1 Initial ERD
+@startuml TEMP_INCREMENT_1_ERD
+title Event & Volunteer Management System - Increment 1 ERD
 
 left to right direction
 skinparam backgroundColor #FFFFFF
@@ -20,7 +20,7 @@ entity "Role" as ROLE {
   role_name : VARCHAR(30) <<UNIQUE>>
 }
 
-entity "User" as USER {
+entity "User" as USR {
   * user_id : BIGINT <<PK>>
   --
   full_name : VARCHAR(150)
@@ -29,7 +29,18 @@ entity "User" as USER {
   role_id : BIGINT <<FK>>
 }
 
-ROLE ||--o{ USER : assigned to
+entity "UserSession" as USER_SESSION {
+  * session_id : BIGINT <<PK>>
+  --
+  user_id : BIGINT <<FK>>
+  token_hash : CHAR(64) <<UNIQUE>>
+  created_at : DATETIME
+  expires_at : DATETIME
+  revoked_at : DATETIME
+}
+
+ROLE ||--o{ USR : assigned to
+USR ||--o{ USER_SESSION : has
 
 note top of ROLE
   Seed roles: Administrator,
@@ -37,15 +48,16 @@ note top of ROLE
   Each account has exactly one role.
 end note
 
-note bottom of USER
+note bottom of USR
   Public registration creates Volunteer accounts only.
   Administrator assigns privileged roles through account management.
   Store a salted, one-way password hash; never a plain-text password.
 end note
 
 legend bottom
-  Increment 1 scope: accounts, authentication credentials, and roles.
+  Increment 1 scope: accounts, authentication credentials, roles, and sessions.
   Event, Application, Task, and Attendance are introduced in later increments.
 endlegend
 
 @enduml
+
