@@ -1,51 +1,57 @@
-﻿# System Architecture — Increment 1 (v0.1.0)
+﻿# System Architecture — Increment 1 (v0.1.0-design)
 
 ## Scope and technology
 
-This repository describes the planned Event & Volunteer Management System. The project description selects a React browser client, Node.js/Express API, and MySQL database. This checkout currently contains design artifacts only; it has no application source, dependency manifest, migration, or executable test suite. Diagrams are design intent and do not claim implementation is complete.
+The Event & Volunteer Management System is planned as a React browser client, Node.js/Express backend, and MySQL database. This repository contains design artifacts only; it has no application source, dependency manifest, database migration, or executable application tests. The diagrams describe intended design and do not claim implementation is complete.
 
-Increment 1 includes **UC01 User Account & Authentication**, **UC02 User Management & RBAC**, and persistence for `users` and `user_sessions`. UC03–UC07 (events, exploration/applications, task assignment, attendance/hours, and statistics) are deferred to Increment 2. The deferred actors remain shown where useful for system context, but their workflows and data are outside v0.1.0.
+Increment 1 covers **UC01 User Account & Authentication**, **UC02 User Management & RBAC**, and persistence for the **`users` table only**: `id`, `name`, `email`, `password_hash`, `role`, `created_at`, and `updated_at`. `role` is one of `ADMINISTRATOR`, `EVENT_ORGANIZER`, or `VOLUNTEER`. UC03–UC07 are deferred across Increments 2–4 (`v0.2.0`–`v0.4.0`): Events & Exploration; Applications, Tasks & Attendance; and Statistics & Analytics.
 
-## Logical layers
+## Simplified architectural structure
 
-1. **Presentation / Boundary:** React UI calls `AuthController` and `AdminUserController` over HTTPS/JSON.
-2. **Application / Services:** `AuthService` handles registration, credential checks, session lifecycle; `UserManagementService` handles account listing/view/update and role changes; `AccessControlService` validates sessions and authorizes administrator operations.
-3. **Data Access:** `UserRepository` issues parameterized MySQL operations for users and sessions.
-4. **Domain:** `User`, `UserSession`, `UserRole`, and `AccountStatus` define account and session state.
+1. **Presentation / Boundary (React UI):** Provides registration, login/logout, and administrator user-management screens. It communicates with the backend API over HTTPS/JSON.
+2. **Control Layer:** `AuthController` handles `register()`, `login()`, and `logout()`. `AdminUserController` handles administrator-only `viewUsers()` and `assignRole()` operations.
+3. **Domain / Entity Layer:** `User` holds `id`, `name`, `email`, `passwordHash`, and `role`; its helper methods are `verifyPassword()` and `hasRole()`. `UserRole` defines the three supported roles.
+4. **Persistence (MySQL):** Stores the `users` table with a unique email, salted one-way `password_hash`, and role enum.
 
-MySQL contains `users` and `user_sessions` tables. Email verification is an optional external integration. Daily backups and restore procedures target Cloud Backup Storage under NFR-02 and NFR-03; they are persistence/operations concerns and do not add later-increment business entities.
+## Registration, roles, and stateless authentication
 
-## Registration, roles, and session policy
+Public registration accepts a name, email, and password. The backend validates and sanitizes the input, enforces valid unique email, hashes the password using a salted one-way algorithm (NFR-10), and always assigns `VOLUNTEER`. It ignores or rejects any client-supplied role. Plaintext passwords are never stored.
 
-Public registration accepts name, email, password. The backend validates and sanitizes fields, enforces valid unique email, hashes passwords with a salted one-way algorithm (NFR-10), and always sets role `VOLUNTEER`; any submitted role field is ignored. Passwords are never persisted in plaintext. Sessions store a token hash, expiry, and optional revocation timestamp.
+`AuthController.login()` issues a signed, expiring JWT in a `Secure`, `HttpOnly`, `SameSite` cookie after verifying the password hash. Authentication state is stateless: there is no separate session entity or session table. `AuthController.logout()` clears the authentication cookie. Expired or invalid signatures are rejected.
 
-The first Administrator is provisioned manually through a guarded setup command, not a public API. The setup requires a protected one-time secret, refuses to proceed if an Administrator already exists, serializes concurrent attempts with a database lock/transaction, and consumes the one-time authorization. After bootstrap, only an authenticated Administrator may assign/change roles or update permitted account fields. Backend authorization is mandatory (FR-04, NFR-12). Public registration cannot create Administrator or Event Organizer accounts.
-
-The detailed provisioning secret-delivery mechanism remains a deployment decision and must be documented before implementation. Never log passwords, session tokens, or bootstrap secrets (NFR-14, NFR-20).
+The first Administrator is created manually through a guarded one-time setup, never through public registration. Setup requires protected one-time authorization, refuses to run if an Administrator already exists, serializes concurrent attempts, and consumes the authorization. Thereafter, only an authenticated Administrator may call `AdminUserController.assignRole()`. The backend validates the requested value against `UserRole` and uses `User.hasRole()` for RBAC checks (FR-04, NFR-12). Public registration cannot grant Administrator or Event Organizer privileges.
 
 ## Persistence and security
 
-`users.email` has a unique constraint; `users.role` is a required enum with exactly the three supported roles; user/session rows have primary keys and timestamps. `user_sessions.user_id` references `users.id`, and session token hashes are unique. Expired/revoked sessions cannot authenticate. Use HTTPS/TLS in transit, restricted database access and appropriate encryption/access controls at rest (NFR-11). Use parameterized SQL, generic login errors, field-level validation feedback, and security/audit events without secrets (NFR-05, NFR-13, NFR-14, NFR-18).
+The `users` table has a primary key, unique `email`, required `password_hash`, required `role` enum, and creation/update timestamps. The role enum permits exactly the three supported values. MySQL access is limited to the backend and uses parameterized statements. HTTPS/TLS protects data in transit; appropriate encryption or access controls protect data at rest (NFR-11).
 
-NFR-01 supplies a login latency target; it requires measurement once implementation exists. Responsive behavior and common navigation are frontend requirements (NFR-16, NFR-17). Automated tests are required by NFR-21 but cannot be claimed until application code and tests exist.
+Use safe user-facing errors without exposing internal details (NFR-05), validate and sanitize inputs (NFR-13), record security-relevant events without passwords or authentication secrets (NFR-14, NFR-20), and collect only necessary account data (NFR-15). Responsive UI, consistent navigation, and field-level validation feedback are required (NFR-16–NFR-18). The login performance target (NFR-01) and automated auth/RBAC tests (NFR-21) require verification when implementation exists. Backup and recovery constraints (NFR-02, NFR-03) are operational requirements and do not add tables to the Increment 1 account model.
 
-## Increment 2 boundary
+Email Service notifications, including registration verification and application status messages, are deferred to later increments; email is not part of Increment 1 account registration. Provider selection and configuration remain future integration decisions.
 
-`Event`, `Application`, `Task`, and `Attendance` and the UC03–UC07 services/repositories are deferred. They appear only as planned context; they are not part of the v0.1.0 persistence schema or implementation scope.
+## Later-increment boundary
+
+- **Increment 2 (`v0.2.0-design` / `v0.2.0`):** Event Management & Exploration (UC03, UC04; FR-05–FR-10).
+- **Increment 3 (`v0.3.0-design` / `v0.3.0`):** Applications, Tasks & Attendance (UC05, UC06; FR-11–FR-18).
+- **Increment 4 (`v0.4.0-design` / `v0.4.0`):** Statistics & Analytics (UC07; FR-19, FR-21).
 
 ## Diagram sources and rendering
 
-Editable sources: `uml/use_case.puml`, `uml/class_diagram.puml`, `uml/sequence_diagram.mmd`, `uml/sequence_auth.mmd`, `uml/sequence_admin_rbac.mmd`, `uml/system_context.puml`, `uml/container.puml`, `uml/component.puml`, `uml/deployment.puml`, `uml/activity_increment1.puml`, `uml/activity_admin_rbac.puml`, and `uml/erd_increment1.puml`.
+Finalized Increment 1 PlantUML sources:
 
-From the repository root, after installing Java and downloading `plantuml.jar` plus Mermaid CLI (`@mermaid-js/mermaid-cli`):
+- `uml/use_case.puml`
+- `uml/class_diagram.puml`
+- `uml/sequence-diagrams/SD01_High_Level_UC01_Auth.puml`
+- `uml/sequence-diagrams/SD02_High_Level_UC02_UserManagement.puml`
+- `uml/sequence-diagrams/SD03_Low_Level_UC01_Auth.puml`
+- `uml/sequence-diagrams/SD04_Low_Level_UC02_UserManagement.puml`
+- `uml/activity-diagrams/AD_Increment1_Combined.puml`
+- `uml/erd_increment1.puml`
+
+From the repository root, with Java and `plantuml.jar` available, render all finalized Increment 1 diagrams into `uml/rendered/` with one command:
 
 ```powershell
-New-Item -ItemType Directory -Force uml/rendered | Out-Null
-java -jar plantuml.jar -tpng -o rendered uml/use_case.puml uml/class_diagram.puml uml/system_context.puml uml/container.puml uml/component.puml uml/deployment.puml uml/activity_increment1.puml uml/activity_admin_rbac.puml uml/erd_increment1.puml
-npx mmdc -i uml/sequence_diagram.mmd -o uml/rendered/sequence-diagram.png
-npx mmdc -i uml/sequence_auth.mmd -o uml/rendered/sequence_auth.png
-npx mmdc -i uml/sequence_admin_rbac.mmd -o uml/rendered/sequence_admin_rbac.png
+java -jar plantuml.jar -tpng -o rendered uml/use_case.puml uml/class_diagram.puml uml/sequence-diagrams/SD01_High_Level_UC01_Auth.puml uml/sequence-diagrams/SD02_High_Level_UC02_UserManagement.puml uml/sequence-diagrams/SD03_Low_Level_UC01_Auth.puml uml/sequence-diagrams/SD04_Low_Level_UC02_UserManagement.puml uml/activity-diagrams/AD_Increment1_Combined.puml uml/erd_increment1.puml
 ```
 
-PlantUML C4 sources use the C4-PlantUML standard library include URL and therefore need network access when the library is not cached. Output PNGs are design renders, not execution evidence.
-
+The generated PNGs are diagram renders, not evidence of working application behavior.
