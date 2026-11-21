@@ -13,21 +13,25 @@ Name: Layan Abu Salah            StudentId: 20241108
 ## 10.2 Project Overview
 * **System Purpose:** Centralizes event organization and volunteer coordination into one web platform, replacing fragmented tools like spreadsheets, online forms, and messaging apps.
 * **Expected Final Outcome:** A functional web application supporting Administrators, Event Organizers, and Volunteers from event creation and registration through task assignment, attendance tracking, and volunteer hour reporting.
-* **Main Technologies & Tools:** HTML, CSS, JavaScript,react, Node.js, MySQL, Git & GitHub, Draw.io.
+* **Main Technologies & Tools:** HTML, CSS, JavaScript, React, Node.js, MySQL, Git & GitHub, PlantUML.
 
 ---
 
 ## 10.3 Architecture and Diagrams
 * **System Architecture Diagram:** Illustrates the high-level client-server structure, routing, and database interaction layers.
 * **Use Case Diagram:** Maps the functional interactions between Administrators, Event Organizers, and Volunteers across core system modules.
-* **Class Diagram:** Defines the domain entities (User, Event, Application, Assignment, Attendance) along with their attributes, methods, and relationships.
-* **Sequence Diagrams:** Details step-by-step object interactions for key workflows including volunteer registration, application approval, and attendance logging.
+* **Class Diagram:** Increment 1 (`v0.1.0-design`) models `User`, `UserRole`, `AuthController`, and `AdminUserController` for UC01–UC02; `Event`, `Application`, `Task`, and `Attendance` are introduced across Increments 2–4.
+* **Sequence Diagrams:** Increment 1 (`v0.1.0-design`) covers UC01–UC02 interactions for `User`, `UserRole`, `AuthController`, and `AdminUserController`; `Event`, `Application`, `Task`, and `Attendance` workflows are introduced across Increments 2–4.
+* **Activity Diagram:** Illustrates step-by-step user and system swimlane workflows for authentication and role management.
 * **Entity-Relationship (ER) Diagram:** Models the relational database schema, primary/foreign keys, and data integrity constraints.
 
 ---
 
 ## 10.4 Repository Structure
-* `/database` Stores database schema definitions, migration scripts, and initial seed data.
+* `/docs` - Requirements, system architecture, incremental development plan, traceability matrix, and AI development log.
+* `/uml` - Editable PlantUML (`.puml`) sources and rendered diagram PNGs under `uml/rendered/`.
+* `/prompts` - Mandatory task prompt records for AI-assisted increments.
+* `/database` - Planned location for database schema definitions, migration scripts, and initial seed data; this folder is not present in the current repository.
 
 
 ---
@@ -47,5 +51,5 @@ See [the incremental development plan](docs/incremental_development_plan.md) for
 
 ---
 
-**Architecture update:** The three-tier React / Node.js-Express / MySQL design integrates with an Email Service for registration/verification and application status messages (FR-01, FR-12), and Cloud Backup Storage for daily offsite MySQL backups with 30-day retention and recovery support (NFR-03, NFR-06, NFR-07). See `docs/architecture.md`, `docs/traceability_matrix.md`, and the C4 diagrams under `uml/`.
-C4 Deployment View: see uml/deployment.puml, rendered as uml/rendered/deployment.png, and documented in docs/architecture.md (Section 5.1).
+**Architecture update:** Increment 1 (`v0.1.0-design`) documents the planned three-tier React / Node.js-Express / MySQL architecture for UC01–UC02. Email Service notifications are deferred to later application increments; email is not part of Increment 1 registration. Backup and recovery are operational requirements; Cloud Backup Storage is not modeled as an Increment 1 integration. See [the architecture](docs/architecture.md), [the incremental development plan](docs/incremental_development_plan.md), [the traceability matrix](docs/traceability_matrix.md), [the AI development log](docs/ai_development_log.md), and the C4 diagrams under `uml/`.
+C4 Deployment View: see [uml/deployment.puml](uml/deployment.puml), rendered as [uml/rendered/deployment.png](uml/rendered/deployment.png), and documented in [docs/architecture.md](docs/architecture.md) (Section 5.1).
