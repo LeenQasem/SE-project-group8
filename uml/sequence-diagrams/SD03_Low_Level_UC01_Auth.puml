@@ -1,86 +1,30 @@
-@startuml SD03_Low_Level_UC01_Auth
+﻿@startuml SD03_Low_Level_UC01_Auth
 title SD03 - Low-Level Sequence Diagram: UC01 User Account & Authentication
 autonumber
 actor User
-participant ":AuthController" as AuthController
-participant ":AuthService" as AuthService
-participant ":UserRepository" as UserRepository
-database "MySQL Database" as DB
+participant ":AuthController" as Auth
+participant ":User" as U
 
-User -> AuthController : register(name, email, password)
-activate AuthController
-AuthController -> AuthService : register(name, email, password)
-activate AuthService
-AuthService -> AuthService : validate and sanitize registration data
-AuthService -> UserRepository : findByEmail(email)
-activate UserRepository
-UserRepository -> DB : SELECT user by email
-activate DB
-DB --> UserRepository : Matching user or no match
-deactivate DB
-UserRepository --> AuthService : Matching user or no match
-deactivate UserRepository
-alt Data is invalid or email is already registered
-    AuthService --> AuthController : Registration rejected with field feedback
-else Data is valid and email is available
-    AuthService -> AuthService : hash password; set role to VOLUNTEER
-    AuthService -> UserRepository : createUser(name, email, passwordHash, VOLUNTEER)
-    activate UserRepository
-    UserRepository -> DB : INSERT user
-    activate DB
-    DB --> UserRepository : Created user record
-    deactivate DB
-    UserRepository --> AuthService : Created user
-    deactivate UserRepository
-    AuthService --> AuthController : Account created (role: Volunteer)
-end
-deactivate AuthService
-AuthController --> User : Registration result
-deactivate AuthController
+User -> Auth : register(name, email, password)
+activate Auth
+Auth -> U ** : <<create>> User(name, email, passwordHash, UserRole.VOLUNTEER)
+activate U
+U --> Auth : User
+deactivate U
+Auth --> User : User
+deactivate Auth
 
-User -> AuthController : login(email, password)
-activate AuthController
-AuthController -> AuthService : login(email, password)
-activate AuthService
-AuthService -> UserRepository : findByEmail(email)
-activate UserRepository
-UserRepository -> DB : SELECT user by email
-activate DB
-DB --> UserRepository : User record or no match
-deactivate DB
-UserRepository --> AuthService : User record or no match
-deactivate UserRepository
-alt User exists and password is valid
-    AuthService -> UserRepository : createSession(userId)
-    activate UserRepository
-    UserRepository -> DB : INSERT user session
-    activate DB
-    DB --> UserRepository : Session stored
-    deactivate DB
-    UserRepository --> AuthService : Session created
-    deactivate UserRepository
-    AuthService --> AuthController : Login successful
-else User is missing or password is invalid
-    AuthService --> AuthController : Login failed (generic credential message)
-end
-deactivate AuthService
-AuthController --> User : Login result
-deactivate AuthController
+User -> Auth : login(email, password)
+activate Auth
+Auth -> U : verifyPassword(password)
+activate U
+U --> Auth : Boolean (true)
+deactivate U
+Auth --> User : Boolean (true)
+deactivate Auth
 
-User -> AuthController : logout(session)
-activate AuthController
-AuthController -> AuthService : logout(session)
-activate AuthService
-AuthService -> UserRepository : revokeSession(session)
-activate UserRepository
-UserRepository -> DB : UPDATE user session as revoked
-activate DB
-DB --> UserRepository : Session update result
-deactivate DB
-UserRepository --> AuthService : Session ended
-deactivate UserRepository
-AuthService --> AuthController : Logout successful
-deactivate AuthService
-AuthController --> User : Logout successful
-deactivate AuthController
+User -> Auth : logout()
+activate Auth
+Auth --> User : void
+deactivate Auth
 @enduml

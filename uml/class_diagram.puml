@@ -7,6 +7,7 @@ skinparam nodesep 25
 skinparam ranksep 35
 skinparam shadowing false
 skinparam classAttributeIconSize 0
+skinparam padding 4
 hide empty members
 
 class User {
@@ -15,8 +16,11 @@ class User {
   - email: String
   - passwordHash: String
   - role: UserRole
+  + User(name: String, email: String, passwordHash: String, role: UserRole)
   + verifyPassword(password: String): Boolean
   + hasRole(role: UserRole): Boolean
+  + getAllUsers(): List<User>
+  + setRole(role: UserRole): User
 }
 
 enum UserRole {
