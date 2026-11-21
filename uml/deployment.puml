@@ -10,7 +10,7 @@ Deployment_Node(clientDevice, "Client Browser Node", "User device / supported br
 
 Deployment_Node(appNode, "Application Server Node (xN)", "Vendor-neutral application compute", "Replicate horizontally as traffic grows (NFR-10, NFR-12); portable deployment configuration (NFR-31)") {
   Container(reactBundle, "React Frontend Bundle", "Static HTML / CSS / JavaScript", "Serves the frontend bundle to client browsers over HTTPS/TLS")
-  Container(api, "Application Backend", "Node.js / Express", "Application API, business logic, email integration, and scheduled backup process")
+  Container(api, "Application Backend", "Python", "Application API, business logic, email integration, and scheduled backup process")
 }
 
 Deployment_Node(privateNetwork, "Private Network", "Restricted network segment", "Database is not publicly reachable; inbound SQL access is limited to the application backend") {

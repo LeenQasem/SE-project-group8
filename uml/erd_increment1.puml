@@ -1,3 +1,5 @@
+@startuml Increment1InitialERD
+title Event & Volunteer Management System - Increment 1 Initial ERD
 @startuml TEMP_INCREMENT_1_ERD
 title Event & Volunteer Management System - Increment 1 ERD
 
@@ -29,6 +31,7 @@ entity "User" as USR {
   role_id : BIGINT <<FK>>
 }
 
+ROLE ||--o{ USER : assigned to
 entity "UserSession" as USER_SESSION {
   * session_id : BIGINT <<PK>>
   --
@@ -55,7 +58,7 @@ note bottom of USR
 end note
 
 legend bottom
-  Increment 1 scope: accounts, authentication credentials, roles, and sessions.
+  Increment 1 scope: accounts, authentication credentials, and roles.
   Event, Application, Task, and Attendance are introduced in later increments.
 endlegend
 

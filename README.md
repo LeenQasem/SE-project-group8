@@ -13,7 +13,7 @@ Name: Layan Abu Salah            StudentId: 20241108
 ## 10.2 Project Overview
 * **System Purpose:** Centralizes event organization and volunteer coordination into one web platform, replacing fragmented tools like spreadsheets, online forms, and messaging apps.
 * **Expected Final Outcome:** A functional web application supporting Administrators, Event Organizers, and Volunteers from event creation and registration through task assignment, attendance tracking, and volunteer hour reporting.
-* **Main Technologies & Tools:** HTML, CSS, JavaScript, React, Node.js, MySQL, Git & GitHub, PlantUML.
+* **Main Technologies & Tools:** HTML, CSS, JavaScript, React, Python, MySQL, Git & GitHub, PlantUML.
 
 ---
 
@@ -51,5 +51,5 @@ See [the incremental development plan](docs/incremental_development_plan.md) for
 
 ---
 
-**Architecture update:** Increment 1 (`v0.1.0-design`) documents the planned three-tier React / Node.js-Express / MySQL architecture for UC01–UC02. Email Service notifications are deferred to later application increments; email is not part of Increment 1 registration. Backup and recovery are operational requirements; Cloud Backup Storage is not modeled as an Increment 1 integration. See [the architecture](docs/architecture.md), [the incremental development plan](docs/incremental_development_plan.md), [the traceability matrix](docs/traceability_matrix.md), [the AI development log](docs/ai_development_log.md), and the C4 diagrams under `uml/`.
+**Architecture update:** Increment 1 (`v0.1.0-design`) documents the planned three-tier React / Python / MySQL architecture for UC01–UC02. Email Service notifications are deferred to later application increments; email is not part of Increment 1 registration. Backup and recovery are operational requirements; Cloud Backup Storage is not modeled as an Increment 1 integration. See [the architecture](docs/architecture.md), [the incremental development plan](docs/incremental_development_plan.md), [the traceability matrix](docs/traceability_matrix.md), [the AI development log](docs/ai_development_log.md), and the C4 diagrams under `uml/`.
 C4 Deployment View: see [uml/deployment.puml](uml/deployment.puml), rendered as [uml/rendered/deployment.png](uml/rendered/deployment.png), and documented in [docs/architecture.md](docs/architecture.md) (Section 5.1).

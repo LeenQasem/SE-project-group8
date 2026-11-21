@@ -18,7 +18,7 @@ Read `docs/requirements.md` and `docs/architecture.md`. Create a complete UML cl
 ## Sources consulted
 
 - `docs/requirements.md` (FR-01–FR-21): account roles and access; organizer event management; volunteer event discovery and applications; application decisions; task assignment; attendance and hours; event and platform reporting.
-- `docs/architecture.md`: React client, Node.js/Express backend, MySQL data tier, role-oriented workflows, and the note that the detailed schema is not yet specified.
+- `docs/architecture.md`: React client, Python backend, MySQL data tier, role-oriented workflows, and the note that the detailed schema is not yet specified.
 
 ## Modeling decisions
 
