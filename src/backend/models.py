@@ -16,6 +16,7 @@ from datetime import datetime
 
 
 _ROLE_NAMES = frozenset({"Administrator", "Event Organizer", "Volunteer"})
+_ROLE_ALIASES = {"ADMINISTRATOR": "Administrator", "EVENT_ORGANIZER": "Event Organizer", "VOLUNTEER": "Volunteer"}
 _TOKEN_HASH_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 _PASSWORD_HASH_PREFIX = "scrypt"
 
@@ -133,6 +134,14 @@ class User:
 
     def verify_password(self, password: str) -> bool:
         return verify_password(password, self.password_hash)
+
+    def has_role(self, role: str | Role) -> bool:
+        """Return whether the user has the requested canonical role."""
+        name = role.role_name if isinstance(role, Role) else role
+        name = _ROLE_ALIASES.get(name, name) if isinstance(name, str) else name
+        return self.role.role_name == name
+
+    hasRole = has_role
 
     def add_session(self, session: UserSession) -> None:
         if self.user_id is None:

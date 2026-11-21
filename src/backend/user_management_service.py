@@ -7,8 +7,10 @@ from typing import Any
 
 try:
     from .models import Role, User
+    from .rbac import AuthorizationError, require_admin
 except ImportError:  # pragma: no cover - backend-dir test discovery
     from models import Role, User
+    from rbac import AuthorizationError, require_admin
 
 
 class UserManagementError(Exception):
@@ -49,6 +51,8 @@ _SELECT_ALL = (
 )
 _EMAIL_OWNER = "SELECT user_id FROM users WHERE email = ? AND user_id <> ?"
 _UPDATE_PROFILE = "UPDATE users SET full_name = ?, email = ? WHERE user_id = ?"
+_ROLE_SQL = "SELECT role_id, role_name FROM roles WHERE role_name = ?"
+_ASSIGN_ROLE_SQL = "UPDATE users SET role_id = ? WHERE user_id = ?"
 
 
 def _mapping(row: Any) -> dict[str, Any]:
@@ -91,6 +95,28 @@ class UserManagementService:
         if not isinstance(offset, int) or isinstance(offset, bool) or offset < 0:
             raise InvalidUserManagementData("offset must be a non-negative integer")
         return self._query(_SELECT_ALL, (limit, offset), many=True)
+
+    def view_users(self, acting_user: User | None, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
+        self._require_admin_user(acting_user)
+        if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 500:
+            raise InvalidUserManagementData("limit must be an integer from 1 to 500")
+        if not isinstance(offset, int) or isinstance(offset, bool) or offset < 0:
+            raise InvalidUserManagementData("offset must be a non-negative integer")
+        return self._query(_SELECT_ALL, (limit, offset), many=True)
+
+    def assign_role(self, acting_user: User | None, target_user_id: int, new_role: str) -> dict[str, Any]:
+        self._require_admin_user(acting_user)
+        target = self._validate_id(target_user_id, "target_user_id")
+        aliases = {"ADMINISTRATOR": "Administrator", "EVENT_ORGANIZER": "Event Organizer", "VOLUNTEER": "Volunteer"}
+        if not isinstance(new_role, str) or new_role not in aliases:
+            raise InvalidUserManagementData("new_role must be ADMINISTRATOR, EVENT_ORGANIZER, or VOLUNTEER")
+        role_row = self._query(_ROLE_SQL, (aliases[new_role],), one=True)
+        if role_row is None:
+            raise UserManagementDatabaseError("configured role was not found")
+        role = Role.from_record(role_row)
+        self._fetch_record(target)  # distinguish a missing target from an unchanged role
+        self._query(_ASSIGN_ROLE_SQL, (role.role_id, target), commit=True)
+        return self._fetch_one(target)
 
     def update_profile(self, user_id: int, changes: dict[str, Any], *, actor_id: int, actor_role: str) -> dict[str, Any]:
         target = self._validate_id(user_id, "user_id")
@@ -167,6 +193,13 @@ class UserManagementService:
         if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
             raise InvalidUserManagementData(f"{field} must be a positive integer")
         return value
+
+    @staticmethod
+    def _require_admin_user(user: User | None) -> None:
+        try:
+            require_admin(user)
+        except AuthorizationError as error:
+            raise UnauthorizedUserManagement(str(error)) from error
 
     @staticmethod
     def _require_admin(actor_id: int, actor_role: str) -> None:

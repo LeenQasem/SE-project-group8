@@ -10,6 +10,7 @@ from user_management_service import (
     UserManagementService,
     UserNotFound,
 )
+from models import Role, User
 
 
 class FakeConnection:
@@ -127,6 +128,29 @@ class UserManagementServiceTests(unittest.TestCase):
             service.get_my_profile(actor_id=7)
         self.assertNotIn("private database detail", str(raised.exception))
         self.assertEqual(connection.rollbacks, 1)
+
+    def test_role_management_requires_admin_and_assigns_allowlisted_roles(self):
+        service, connection = self.service()
+        for actor in (None, User(5, "Volunteer", "v@example.com", "hash", Role(3, "Volunteer")),
+                      User(6, "Organizer", "o@example.com", "hash", Role(2, "Event Organizer"))):
+            with self.subTest(actor=actor), self.assertRaises(UnauthorizedUserManagement):
+                service.assign_role(actor, 7, "ADMINISTRATOR")
+            with self.subTest(actor=actor), self.assertRaises(UnauthorizedUserManagement):
+                service.view_users(actor)
+        admin = User(1, "Admin", "a@example.com", "hash", Role(1, "Administrator"))
+        for value in ("ADMINISTRATOR", "EVENT_ORGANIZER", "VOLUNTEER"):
+            with self.subTest(role=value):
+                result = service.assign_role(admin, 7, value)
+                self.assertNotIn("password_hash", result)
+        self.assertEqual(connection.commits, 3)
+
+    def test_role_assignment_rejects_invalid_role_and_missing_target(self):
+        service, _ = self.service()
+        admin = User(1, "Admin", "a@example.com", "hash", Role(1, "Administrator"))
+        with self.assertRaises(InvalidUserManagementData):
+            service.assign_role(admin, 7, "OWNER")
+        with self.assertRaises(UserNotFound):
+            service.assign_role(admin, 8, "VOLUNTEER")
 
 
 if __name__ == "__main__":

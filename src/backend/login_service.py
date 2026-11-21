@@ -40,6 +40,12 @@ _USER_SQL = (
     "JOIN roles AS r ON r.role_id = u.role_id WHERE u.email = ?"
 )
 _SESSION_SQL = "INSERT INTO user_sessions (user_id, token_hash, expires_at) VALUES (?, ?, ?)"
+_AUTHENTICATE_TOKEN_SQL = (
+    "SELECT u.user_id, u.full_name, u.email, u.password_hash, u.role_id, "
+    "u.created_at, u.updated_at, r.role_name FROM user_sessions AS s "
+    "JOIN users AS u ON u.user_id = s.user_id JOIN roles AS r ON r.role_id = u.role_id "
+    "WHERE s.token_hash = ? AND s.revoked_at IS NULL AND s.expires_at > CURRENT_TIMESTAMP"
+)
 
 
 def _mapping(row: Any, columns: tuple[str, ...]) -> dict[str, Any]:
@@ -103,6 +109,30 @@ class LoginService:
             self._safe_rollback()
             # Keep DB and unexpected authentication internals out of client errors.
             raise LoginDatabaseError("login could not be completed") from error
+        finally:
+            if cursor is not None:
+                try:
+                    cursor.close()
+                except Exception:
+                    pass
+
+    def authenticate_token(self, token: str | None) -> User | None:
+        """Resolve an active bearer token to its current persisted user role."""
+        if not isinstance(token, str) or not token:
+            return None
+        cursor = None
+        try:
+            cursor = self._connection.cursor()
+            cursor.execute(_AUTHENTICATE_TOKEN_SQL, (UserSession.digest_token(token),))
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            record = _mapping(row, ("user_id", "full_name", "email", "password_hash", "role_id", "created_at", "updated_at", "role_name"))
+            role = Role.from_record({"role_id": record["role_id"], "role_name": record["role_name"]})
+            return User.from_record(record, role)
+        except Exception as error:
+            self._safe_rollback()
+            raise LoginDatabaseError("token authentication could not be completed") from error
         finally:
             if cursor is not None:
                 try:
