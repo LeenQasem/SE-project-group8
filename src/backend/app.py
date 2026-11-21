@@ -1,0 +1,147 @@
+"""Zero-dependency WSGI JSON API for Increment 1.
+
+Create the app with service-backed controllers, then serve it with
+``wsgiref.simple_server``. A DB-API connection factory must be supplied by the
+deployment because this repository does not select a Python MySQL driver.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from datetime import date, datetime
+from http import HTTPStatus
+from pathlib import Path
+
+try:
+    from .login_service import InvalidCredentials, InvalidLoginData, LoginDatabaseError, LoginError
+    from .registration_service import (DefaultRoleMissing, EmailAlreadyRegistered,
+        InvalidRegistrationData, RegistrationDatabaseError, RegistrationError)
+    from .rbac import AuthorizationError
+    from .user_management_service import (InvalidUserManagementData, UnauthorizedUserManagement,
+        UserManagementDatabaseError, UserManagementError, UserNotFound)
+except ImportError:  # pragma: no cover
+    from login_service import InvalidCredentials, InvalidLoginData, LoginDatabaseError, LoginError
+    from registration_service import (DefaultRoleMissing, EmailAlreadyRegistered,
+        InvalidRegistrationData, RegistrationDatabaseError, RegistrationError)
+    from rbac import AuthorizationError
+    from user_management_service import (InvalidUserManagementData, UnauthorizedUserManagement,
+        UserManagementDatabaseError, UserManagementError, UserNotFound)
+
+
+def _json_default(value):
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    raise TypeError(f"unsupported JSON value: {type(value).__name__}")
+
+
+def create_app(auth_controller, admin_controller, frontend_path=None):
+    """Return a WSGI callable suitable for tests and ``wsgiref`` serving."""
+    page = Path(frontend_path) if frontend_path else Path(__file__).resolve().parents[1] / "frontend" / "index.html"
+
+    def app(environ, start_response):
+        method, path = environ.get("REQUEST_METHOD", "GET").upper(), environ.get("PATH_INFO", "/")
+        try:
+            if method == "GET" and path == "/":
+                body, content_type = page.read_bytes(), "text/html; charset=utf-8"
+                return _respond(start_response, HTTPStatus.OK, body, content_type)
+            payload = _read_json(environ) if method in {"POST", "PATCH", "PUT"} else {}
+            token = _bearer(environ)
+            if method == "POST" and path == "/api/auth/register":
+                result = auth_controller.register(payload.get("name"), payload.get("email"), payload.get("password"))
+                return _respond(start_response, HTTPStatus.CREATED, result)
+            if method == "POST" and path == "/api/auth/login":
+                return _respond(start_response, HTTPStatus.OK, auth_controller.login(payload.get("email"), payload.get("password")))
+            if method == "POST" and path == "/api/auth/logout":
+                if not token:
+                    return _respond(start_response, HTTPStatus.UNAUTHORIZED, {"error": "authentication is required"})
+                auth_controller.logout(token)
+                return _respond(start_response, HTTPStatus.OK, {"message": "Logged out"})
+            if method == "GET" and path == "/api/admin/users":
+                return _respond(start_response, HTTPStatus.OK, {"users": admin_controller.view_users(token)})
+            role_match = re.fullmatch(r"/api/admin/users/(\d+)/role", path)
+            if method == "PATCH" and role_match:
+                result = admin_controller.assign_role(token, int(role_match.group(1)), payload.get("role"))
+                return _respond(start_response, HTTPStatus.OK, result)
+            if method == "POST" and path == "/api/admin/users/role":
+                result = admin_controller.assign_role(token, payload.get("user_id"), payload.get("role"))
+                return _respond(start_response, HTTPStatus.OK, result)
+            return _respond(start_response, HTTPStatus.NOT_FOUND, {"error": "Route not found"})
+        except (ValueError, TypeError, InvalidLoginData, InvalidRegistrationData, InvalidUserManagementData) as error:
+            return _respond(start_response, HTTPStatus.BAD_REQUEST, {"error": str(error)})
+        except (InvalidCredentials, AuthorizationError, UnauthorizedUserManagement) as error:
+            unauthorized = isinstance(error, InvalidCredentials) or "authentication is required" in str(error).lower()
+            return _respond(start_response, HTTPStatus.UNAUTHORIZED if unauthorized else HTTPStatus.FORBIDDEN,
+                            {"error": str(error)})
+        except UserNotFound as error:
+            return _respond(start_response, HTTPStatus.NOT_FOUND, {"error": str(error)})
+        except (EmailAlreadyRegistered,) as error:
+            return _respond(start_response, HTTPStatus.CONFLICT, {"error": str(error)})
+        except (RegistrationError, LoginError, UserManagementError, RuntimeError) as error:
+            return _respond(start_response, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(error)})
+        except Exception:
+            return _respond(start_response, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "Request could not be completed"})
+
+    return app
+
+
+def create_app_from_connection(connection, frontend_path=None):
+    """Wire the existing services/controllers around an injected DB connection."""
+    try:
+        from .controllers import AdminUserController, AuthController
+        from .login_service import LoginService
+        from .registration_service import RegistrationService
+        from .user_management_service import UserManagementService
+    except ImportError:  # pragma: no cover
+        from controllers import AdminUserController, AuthController
+        from login_service import LoginService
+        from registration_service import RegistrationService
+        from user_management_service import UserManagementService
+    registration, login = RegistrationService(connection), LoginService(connection)
+    auth = AuthController(registration, login, connection)
+    admin = AdminUserController(login, UserManagementService(connection))
+    return create_app(auth, admin, frontend_path)
+
+
+def serve(connection, host="127.0.0.1", port=8000):
+    """Run the demo using a caller-provided DB-API connection."""
+    from wsgiref.simple_server import make_server
+    application = create_app_from_connection(connection)
+    with make_server(host, port, application) as server:
+        print(f"Increment 1 demo listening at http://{host}:{port}/")
+        server.serve_forever()
+
+
+def _read_json(environ):
+    try:
+        length = int(environ.get("CONTENT_LENGTH") or 0)
+    except ValueError as error:
+        raise ValueError("invalid content length") from error
+    if length < 0 or length > 1024 * 1024:
+        raise ValueError("request body is too large")
+    raw = environ["wsgi.input"].read(length) if length else b"{}"
+    try:
+        value = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("request body must be valid JSON") from error
+    if not isinstance(value, dict):
+        raise ValueError("JSON body must be an object")
+    return value
+
+
+def _bearer(environ):
+    value = environ.get("HTTP_AUTHORIZATION", "")
+    if not value:
+        return None
+    scheme, separator, token = value.partition(" ")
+    return token.strip() if separator and scheme.lower() == "bearer" and token.strip() else None
+
+
+def _respond(start_response, status, data, content_type="application/json; charset=utf-8"):
+    body = data if isinstance(data, bytes) else json.dumps(data, default=_json_default).encode("utf-8")
+    phrase = status.phrase
+    start_response(f"{status.value} {phrase}", [("Content-Type", content_type), ("Content-Length", str(len(body))), ("Cache-Control", "no-store")])
+    return [body]
+
+
+__all__ = ["create_app", "create_app_from_connection", "serve"]
