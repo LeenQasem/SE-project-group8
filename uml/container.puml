@@ -9,7 +9,7 @@ System_Ext(email, "Email Service", "Account registration/verification and applic
 System_Ext(backup, "Cloud Backup Storage", "Offsite backups; daily schedule, 30-day retention, recovery support")
 System_Boundary(evm, "Event & Volunteer Management System") {
  Container(web, "Web Frontend", "React, JavaScript, HTML, CSS", "Role-aware browser UI for event discovery, applications, assignments, attendance and reports")
- Container(api, "Application Backend", "Node.js, Express", "HTTP API, authentication and authorization, business rules, email notifications and scheduled backup process")
+ Container(api, "Application Backend", "Python", "HTTP API, authentication and authorization, business rules, email notifications and scheduled backup process")
  ContainerDb(db, "Relational Database", "MySQL", "Persistent users, events, applications, assignments, attendance and participation hours")
 }
 Rel(volunteer, web, "Uses", "HTTPS")

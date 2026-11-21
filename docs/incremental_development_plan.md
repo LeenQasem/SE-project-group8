@@ -36,7 +36,7 @@ The roadmap separates design milestones (`-design`) from working releases. UC01 
 
 **Main Question:** Can users register and authenticate safely while only administrators can view accounts and assign roles?
 
-**Tools:** React, Node.js/Express, MySQL, Git/GitHub, Node.js built-in `node:test` runner.
+**Tools:** React, Python, MySQL, Git/GitHub, Python standard-library `unittest` runner.
 
 **Acceptance Criteria:**
 
@@ -63,7 +63,7 @@ The roadmap separates design milestones (`-design`) from working releases. UC01 
 
 **Main Question:** Can organizers publish events and volunteers find and apply to eligible events?
 
-**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`.
+**Tools:** React, Python, MySQL, Git/GitHub, Python standard-library `unittest` runner.
 
 **Acceptance Criteria:**
 
@@ -87,7 +87,7 @@ The roadmap separates design milestones (`-design`) from working releases. UC01 
 
 **Main Question:** Can organizers process applications, assign eligible volunteers, and record participation accurately?
 
-**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`.
+**Tools:** React, Python, MySQL, Git/GitHub, Python standard-library `unittest` runner.
 
 **Acceptance Criteria:**
 
@@ -111,7 +111,7 @@ The roadmap separates design milestones (`-design`) from working releases. UC01 
 
 **Main Question:** Can authorized organizers and administrators view accurate scoped statistics?
 
-**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`.
+**Tools:** React, Python, MySQL, Git/GitHub, Python standard-library `unittest` runner.
 
 **Acceptance Criteria:**
 
@@ -123,7 +123,7 @@ The roadmap separates design milestones (`-design`) from working releases. UC01 
 
 **Main Question:** Do all increments work together as a secure, usable, and traceable system?
 
-**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`, browser automation selected during implementation, PlantUML/Mermaid.
+**Tools:** React, Python, MySQL, Git/GitHub, Python standard-library `unittest` runner, browser automation selected during implementation, PlantUML/Mermaid.
 
 **Acceptance Criteria:**
 

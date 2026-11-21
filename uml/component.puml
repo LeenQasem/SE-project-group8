@@ -4,8 +4,8 @@
 
 title C4 Level 3 — Backend Components (Increment 1: v0.1.0-design)
 
-Container_Boundary(api, "Application Backend (Node.js / Express)") {
-  Component(routes, "API Routes", "Express routers", "Exposes HTTP endpoints and dispatches requests to Increment 1 controllers")
+Container_Boundary(api, "Application Backend (Python)") {
+  Component(routes, "API Routes", "Python", "Exposes HTTP endpoints and dispatches requests to Increment 1 controllers")
   Component(auth, "AuthController", "Controller", "Handles public register(), login(), and logout(); hashes passwords and sets default role VOLUNTEER")
   Component(adminUsers, "AdminUserController", "Controller", "Handles administrator-only viewUsers() and assignRole(); enforces RBAC with User.hasRole()")
   Component(userDomain, "User Domain Model", "User & UserRole", "Encapsulates user attributes, verifyPassword(), and hasRole()")
