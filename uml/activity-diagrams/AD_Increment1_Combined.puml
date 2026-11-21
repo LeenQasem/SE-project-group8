@@ -1,0 +1,50 @@
+﻿@startuml AD_Increment1_Combined
+title Activity Diagram — Increment 1 (UC01 & UC02)
+skinparam shadowing false
+skinparam activity {
+BackgroundColor #EEF5FB
+BorderColor #36536F
+DiamondBackgroundColor #FFF3D6
+DiamondBorderColor #A87516
+}
+|User|
+start
+if (Select Workflow) then (UC01: User Account & Auth)
+if (Has an account?) then (no - register)
+:Enter name, email, and password;
+|System (AuthController)|
+:Hash password and create User
+with default role VOLUNTEER;
+:Save user account;
+else (yes - login)
+|User|
+:Continue to login;
+endif
+|User|
+:Enter email and password;
+|System (AuthController)|
+:Call User.verifyPassword();
+if (Valid credentials?) then (yes)
+:Grant access;
+|User|
+:Click Logout;
+|System (AuthController)|
+:Call logout();
+else (no)
+:Show invalid login error;
+endif
+stop
+else (UC02: Admin User Management & RBAC)
+|Administrator|
+:Request user list;
+|System (AdminUserController)|
+:Fetch all users (viewUsers());
+|Administrator|
+:Select target user and new UserRole
+(ADMINISTRATOR, EVENT_ORGANIZER, or VOLUNTEER);
+|System (AdminUserController)|
+:Update role (assignRole(userId, role));
+:Confirm role updated;
+stop
+endif
+@enduml

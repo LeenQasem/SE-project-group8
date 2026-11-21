@@ -1,12 +1,17 @@
 ﻿# AI Development Log
 
+This log records AI-assisted engineering activities across each increment of the **Event & Volunteer Management System** in accordance with Section 3.3 of the project guidelines. Full task prompts are stored in the [`prompts/`](../prompts/) directory; minor interactive exchanges are summarized rather than logged verbatim.
+
+## Increment Log
+
 | Version | Agent | Task / Prompt Ref. | Changed Modules | Issues / Corrections | Student Review |
 |---|---|---|---|---|---|
-| v0.4.0-design | Codex | Requirements and system architecture — [step4_architecture.md](../prompts/step4_architecture.md) | Requirements, architecture, C4 context/container/component views, traceability, report, README | Added external email and cloud backup systems; linked email to FR-01 / FR-12 and NFR-03, and backup/restore to NFR-06 / NFR-07. Preserved numbered requirements and recorded dependencies. | [Reviewed by Team Member] |
-| v0.4.1-design | Codex | System Architecture + External Systems — [step4_architecture.md](../prompts/step4_architecture.md) | Architecture documentation, C4 diagrams, requirements dependency note, traceability, report, README | Added Email Service and Cloud Backup Storage to C4 Levels; documented daily offsite backups, 30-day retention, and recovery support without claiming implementation. | [Reviewed by Team Member] |
-| v0.4.2-design | Codex | Deployment View — [step4_architecture.md](../prompts/step4_architecture.md) | Deployment diagram, architecture, traceability, report | Added vendor-neutral browser, scalable application, private database, email, and backup nodes; linked choices to relevant NFRs. | [Reviewed by Team Member] |
-| v0.5.0-design | Codex | UML Class Diagram — [step5_class_diagram.md](../prompts/step5_class_diagram.md) | UML class model | Corrected the modeling note to state Attendance is associated with Volunteer and Event; documented assumptions and retained the organizer recording association in the model. | [Reviewed by Team Member] |
-| v0.6.0-plan | Codex | Incremental Development Plan (no dedicated prompt record; nearest existing prompt: [step5_class_diagram.md](../prompts/step5_class_diagram.md)) | Incremental development plan | Plan outline is present in `docs/incremental_development_plan.md`; no separate prompt record for this milestone exists in `/prompts/`. | [Reviewed by Team Member] |
-
-| v0.1.0-design | Codex | Increment 1 Class Diagram — [class_diagram_increment1_prompt.md](../prompts/class_diagram_increment1_prompt.md) | Increment 1 UML class design | Aligned the scoped class model with the ERD; omitted unsupported account-status and session-persistence details. Rendering was unavailable (PlantUML/Java/image renderer absent). | Pending team review |
-
+| `v0.1.0-design` | OpenAI Codex | [Increment 1 architecture and UML prompt](../prompts/v0.1.0-design_increment1_architecture_uml.md) | `uml/use_case.puml`, `uml/class_diagram.puml`, `uml/sequence-diagrams/SD01_High_Level_UC01_Auth.puml`–`SD04_Low_Level_UC02_UserManagement.puml`, `uml/activity-diagrams/AD_Increment1_Combined.puml`, `uml/erd_increment1.puml`, `docs/incremental_development_plan.md`, `docs/traceability_matrix.md` | Reduced the class model to `AuthController`, `AdminUserController`, `User`, and `UserRole`; scoped design to UC01/UC02; recorded Volunteer-default registration and guarded manual initial Administrator provisioning. ERD and combined activity sources were rendered and validated. No application code or automated tests were implemented or run. | Pending student review |
+| `v0.1.0` | Planned | Planned prompt: `prompts/v0.1.0-task.md` | Planned: `AuthController`, `AdminUserController`, `User`, `UserRole`, `tests/auth/`, `tests/admin/` | Pending implementation | Pending review |
+| `v0.2.0-design` | Planned | Planned prompt: `prompts/v0.2.0-design-task.md` | Planned: `uml/increment2/`, `docs/incremental_development_plan.md`, `docs/traceability_matrix.md` | Pending design | Pending review |
+| `v0.2.0` | Planned | Planned prompt: `prompts/v0.2.0-task.md` | Planned: Event and Explore modules, `tests/events/`, `tests/explore/` | Pending implementation | Pending review |
+| `v0.3.0-design` | Planned | Planned prompt: `prompts/v0.3.0-design-task.md` | Planned: `uml/increment3/`, `docs/incremental_development_plan.md`, `docs/traceability_matrix.md` | Pending design | Pending review |
+| `v0.3.0` | Planned | Planned prompt: `prompts/v0.3.0-task.md` | Planned: Application and Attendance modules, `tests/applications/`, `tests/attendance/` | Pending implementation | Pending review |
+| `v0.4.0-design` | Planned | Planned prompt: `prompts/v0.4.0-design-task.md` | Planned: `uml/increment4/`, `docs/incremental_development_plan.md`, `docs/traceability_matrix.md` | Pending design | Pending review |
+| `v0.4.0` | Planned | Planned prompt: `prompts/v0.4.0-task.md` | Planned: Analytics module, `tests/analytics/` | Pending implementation | Pending review |
+| `v1.0.0` | Planned | Planned prompt: `prompts/v1.0.0-task.md` | Planned: integrated system and `tests/e2e/` | Pending final integration | Pending review |

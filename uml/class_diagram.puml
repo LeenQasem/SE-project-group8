@@ -1,0 +1,46 @@
+﻿@startuml class_diagram
+title Event & Volunteer Management System — Increment 1 Class Diagram
+
+top to bottom direction
+skinparam linetype polyline
+skinparam nodesep 25
+skinparam ranksep 35
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam padding 4
+hide empty members
+
+class User {
+  - id: UUID
+  - name: String
+  - email: String
+  - passwordHash: String
+  - role: UserRole
+  + User(name: String, email: String, passwordHash: String, role: UserRole)
+  + verifyPassword(password: String): Boolean
+  + hasRole(role: UserRole): Boolean
+  + getAllUsers(): List<User>
+  + setRole(role: UserRole): User
+}
+
+enum UserRole {
+  ADMINISTRATOR
+  EVENT_ORGANIZER
+  VOLUNTEER
+}
+
+class AuthController {
+  + register(name: String, email: String, password: String): User
+  + login(email: String, password: String): Boolean
+  + logout(): void
+}
+
+class AdminUserController {
+  + viewUsers(): List<User>
+  + assignRole(userId: UUID, role: UserRole): User
+}
+
+AuthController "1" --> "0..*" User
+AdminUserController "1" --> "0..*" User
+User "0..*" --> "1" UserRole : role
+@enduml

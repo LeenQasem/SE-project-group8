@@ -1,454 +1,137 @@
-# Incremental Development Plan
+﻿# Incremental Development Plan
 
-### 1. Development Approach
+## Four-Increment Roadmap
 
-The Event & Volunteer Management System will be developed using an incremental development approach. The system will be divided into four functional increments, each introducing a specific set of related capabilities.
+The roadmap separates design milestones (`-design`) from working releases. UC01 and UC02 are Increment 1; UC03–UC04 are Increment 2; UC05–UC06 are Increment 3; UC07 is Increment 4. The simplified Increment 1 feature diagrams are available; later-increment UML, application source, test directories, and working releases remain planned deliverables.
 
-Each increment will have two checkpoints:
-
-- **Design checkpoint (`-design`):** Requirements, workflows, architecture and relevant UML/database designs are prepared and reviewed before implementation.
-- **Working checkpoint:** The approved functionality is implemented using Agentic AI, tested, validated and merged through GitHub.
-
-The four increments follow the natural workflow of the system:
-
-1. Authentication and User Management.
-2. Event Management and Discovery.
-3. Volunteer Applications and Assignments.
-4. Attendance, Hours Tracking and Reports.
-
-UML modeling will be completed within the existing design checkpoints, starting with the High-Level Use Case Diagram, followed by three High-Level Sequence Diagrams (one for each actor: Volunteer, Event Organizer, and Administrator), and then three Low-Level Sequence Diagrams.
-
-The Volunteer "Apply for Events" Low-Level Sequence Diagram is already completed and merged into main at `uml/sequence_diagram.mmd`. The remaining two Low-Level Sequence Diagrams will be prepared after the High-Level diagrams are completed and reviewed.
-
-These diagrams are design deliverables within the four existing increments, not additional increments.
-
-After completing all four increments, the team will integrate and validate the complete application before releasing version `v1.0.0`.
-
----
-
-### 2. Increment Summary
-
-| Version | Type | Capability / Scope | Deliverables / Evidence | Requirements / Design Links |
+| Version | Type | Capability / Scope | Deliverable / Evidence | Requirements / Design Links |
 |---|---|---|---|---|
-| `v0.1.0-design` | Design | Authentication and User Management | Authentication workflow, role permissions, initial ERD | FR-01-FR-04, FR-20; NFR-01, NFR-05, NFR-10-NFR-15, NFR-17-NFR-22 |
-| `v0.1.0` | Working | User registration, login, logout, account management and role-based access | Authentication module, user management module, automated tests | FR-01-FR-04, FR-20; NFR-01, NFR-05, NFR-10-NFR-15, NFR-17-NFR-22 |
-| `v0.2.0-design` | Design | Event Management and Discovery | Event workflows, event data model and updated ERD | FR-05-FR-09; NFR-05, NFR-11-NFR-13, NFR-16-NFR-20, NFR-22-NFR-25 |
-| `v0.2.0` | Working | Event creation, editing, cancellation, browsing and searching | Event management module, event discovery module, automated tests | FR-05-FR-09; NFR-05, NFR-11-NFR-13, NFR-16-NFR-25 |
-| `v0.3.0-design` | Design | Volunteer Applications and Assignments | Application workflows, approval process, assignment workflow and updated ERD | FR-10-FR-15; NFR-01, NFR-04-NFR-07, NFR-09, NFR-11-NFR-15, NFR-18, NFR-20-NFR-22, NFR-25 |
-| `v0.3.0` | Working | Application submission, approval, rejection, status tracking and task assignment | Application module, assignment module, automated tests | FR-10-FR-15; NFR-01, NFR-04-NFR-07, NFR-09, NFR-11-NFR-15, NFR-18, NFR-20-NFR-22, NFR-25 |
-| `v0.4.0-design` | Design | Attendance, Hours Tracking and Reports | Attendance workflow, hours calculation rules, reporting design and updated ERD | FR-16-FR-19, FR-21; NFR-01, NFR-03-NFR-05, NFR-11-NFR-15, NFR-20-NFR-22, NFR-25 |
-| `v0.4.0` | Working | Attendance recording, volunteer-hours calculation, participation history and reports | Attendance module, hours-tracking module, reporting module and automated tests | FR-16-FR-19, FR-21; NFR-01, NFR-03-NFR-05, NFR-11-NFR-15, NFR-20-NFR-22, NFR-25 |
-| `v1.0.0` | Final | Complete Integrated System | Integrated application, system testing, final documentation and demonstration | FR-01-FR-21; NFR-01-NFR-25, including NFR-6 (500 concurrent active users; shown as NFR-6: NFR-10 in requirements); complete UML and architecture documentation |
+| v0.1.0-design | Design | User Account, Authentication & RBAC (UC01, UC02) | Simplified UML, traceability | [FR-01–FR-04, FR-20](requirements.md); [use case](../uml/use_case.puml), [class](../uml/class_diagram.puml), [SD01](../uml/sequence-diagrams/SD01_High_Level_UC01_Auth.puml), [SD02](../uml/sequence-diagrams/SD02_High_Level_UC02_UserManagement.puml), [SD03](../uml/sequence-diagrams/SD03_Low_Level_UC01_Auth.puml), [SD04](../uml/sequence-diagrams/SD04_Low_Level_UC02_UserManagement.puml), [combined activity](../uml/activity-diagrams/AD_Increment1_Combined.puml), [initial ERD](../uml/erd_increment1.puml), [traceability](traceability_matrix.md) |
+| v0.1.0 | Working | User Account, Authentication & RBAC (UC01, UC02) | Working code, tests, demo | [FR-01–FR-04, FR-20](requirements.md); planned tests: `tests/auth/`, `tests/admin/`; [test plan](testing.md) |
+| v0.2.0-design | Design | Event Management & Exploration (UC03, UC04) | Updated UML and events/applications ERD | [FR-05–FR-10](requirements.md); planned diagrams: `uml/increment2/use_case.puml`, `uml/increment2/class_diagram.puml`, `uml/increment2/erd.puml`, `uml/increment2/sequence_*.puml` |
+| v0.2.0 | Working | Event Management & Exploration (UC03, UC04) | Event/browse/apply code, tests, demo | [FR-05–FR-10](requirements.md); planned modules: Event and Explore; tests: `tests/events/`, `tests/explore/` |
+| v0.3.0-design | Design | Applications, Tasks & Attendance (UC05, UC06) | Updated UML and tasks/attendance ERD | [FR-11–FR-18](requirements.md); planned diagrams: `uml/increment3/use_case.puml`, `uml/increment3/class_diagram.puml`, `uml/increment3/erd.puml`, `uml/increment3/sequence_*.puml` |
+| v0.3.0 | Working | Applications, Tasks & Attendance (UC05, UC06) | Approval/task/hours code, tests, demo | [FR-11–FR-18](requirements.md); planned modules: Application and Attendance; tests: `tests/applications/`, `tests/attendance/` |
+| v0.4.0-design | Design | Statistics & Analytics (UC07) | Updated metrics UML | [FR-19, FR-21](requirements.md); planned diagrams: `uml/increment4/use_case.puml`, `uml/increment4/class_diagram.puml`, `uml/increment4/sequence_*.puml` |
+| v0.4.0 | Working | Statistics & Analytics (UC07) | Reporting/statistics code, tests, demo | [FR-19, FR-21](requirements.md); planned module: Analytics; tests: `tests/analytics/` |
+| v1.0.0 | Final Integration | Full Event & Volunteer Management System | Integrated code, full test suite, release demo | [FR-01–FR-21](requirements.md); all modules; `tests/e2e/` |
 
----
+## Version Acceptance Criteria
 
-### 3. Detailed Increment Specifications
+### v0.1.0-design — User Account, Authentication & RBAC design
 
-## Increment 1: Authentication and User Management
+**Main Question:** How do UC01 and UC02 support basic authentication and administrator-only role management with the simplified domain model?
 
-**Versions:** `v0.1.0-design` → `v0.1.0`
+**Tools:** PlantUML, Mermaid CLI for `.mmd` sources, Git/GitHub, Markdown.
 
-**Objective:**
+**Acceptance Criteria:**
 
-Establish the foundation of the system by implementing user authentication, account management and role-based access control.
-
-#### Design checkpoint: v0.1.0-design
+- The Increment 1 class diagram contains only `AuthController`, `AdminUserController`, `User`, and `UserRole` with the specified operations and role enum.
+- `AuthController` registration validates input, stores a salted one-way password hash, and assigns `VOLUNTEER` by default; public signup cannot select a privileged role.
+- `AdminUserController.assignRole()` is restricted to administrators and accepts only `ADMINISTRATOR`, `EVENT_ORGANIZER`, or `VOLUNTEER`.
+- UC01/UC02 sequence and activity diagrams agree with the class/use-case diagrams; the ERD contains only the agreed Increment 1 user persistence fields.
+- Design links and FR-01–FR-04/FR-20 traceability are reviewed; diagrams render without PlantUML syntax errors.
 
-**Main question:**
-
-How will users register, log in and access the system according to their assigned roles and permissions?
-
-**Scope:**
-- Define the Administrator, Event Organizer and Volunteer roles.
-- Define user account creation and login workflows, including volunteer registration.
-- Define user authentication and credential validation.
-- Specify role-based access permissions.
-- Define administrator management of user and organizer accounts.
-- Design the initial database structure for users and roles.
-
-**Tools:**
-- PlantUML for UML diagrams.
-- Database modeling tools for the ERD.
-- Markdown for requirements and design documentation.
-- GitHub for version control.
-
-**Deliverables:**
-- Authentication Activity Diagram.
-- Existing High-Level Use Case Diagram (`uml/use_case_diagram.puml`), retained as the starting point for sequence modeling.
-- Initial Entity Relationship Diagram.
-- User-role and permission specifications.
-- Updated requirements documentation.
-
-**Acceptance criteria:**
-- All three user roles are clearly defined.
-- Registration and login workflows are documented.
-- Role permissions are specified.
-- User and Role entities and their relationships are represented in the ERD.
-- The design is reviewed and approved by the team.
-
-#### Working checkpoint: v0.1.0
-
-**Main question:**
-
-Can users securely access the system and receive permissions according to their assigned roles?
-
-**Scope:**
-- Implement user account creation, including volunteer registration, according to the approved role-assignment design.
-- Implement login and logout.
-- Validate user credentials.
-- Store passwords securely.
-- Implement role-based access control.
-- Allow administrators to manage user and organizer accounts.
-
-**Tools:**
-- Agentic AI coding tool (Codex or another approved agent).
-- Git and GitHub.
-- The team's selected frontend, backend and database technologies.
-- Appropriate automated testing tools.
-
-**Deliverables:**
-- Functional authentication module.
-- User and role management functionality.
-- Role-based access control.
-- Automated test results.
-- Updated technical documentation.
-
-**Acceptance criteria:**
-- Users can create accounts using valid information according to the approved role-assignment design.
-- Users can log in and log out.
-- Invalid credentials are rejected.
-- Passwords are stored securely.
-- Users can access only the functionality permitted by their roles.
-- Administrators can manage user and organizer accounts.
-- Relevant automated tests pass.
+### v0.1.0 — User Account, Authentication & RBAC implementation
 
----
-
-## Increment 2: Event Management and Discovery
-
-**Versions:** `v0.2.0-design` → `v0.2.0`
-
-**Objective:**
-
-Enable event organizers to create and manage events while allowing volunteers to browse and search for available volunteering opportunities.
-
-#### Design checkpoint: v0.2.0-design
-
-**Main question:**
-
-How will organizers create and manage events, and how will volunteers discover available events?
-
-**Scope:**
-- Define event information and attributes.
-- Design event creation and editing workflows.
-- Define event cancellation rules.
-- Design event browsing and searching.
-- Define the relationship between events and their organizers.
-- Update the ERD to include the Event entity.
-
-**Tools:**
-- PlantUML or draw.io.
-- Mermaid.
-- Database modeling tools.
-- Markdown documentation.
-- GitHub.
-
-**Deliverables:**
-- Event management workflow diagrams.
-- Three High-Level Sequence Diagrams, covering Volunteer, Event Organizer and Administrator interactions with the system.
-- Updated ERD.
-- Event management specifications.
-- Updated requirements documentation.
-
-**Acceptance criteria:**
-- All three High-Level Sequence Diagrams are completed and reviewed.
-- Event attributes are identified.
-- Event creation, editing and cancellation workflows are documented.
-- The relationship between organizers and events is defined.
-- Event discovery and searching workflows are documented.
-- The design is consistent with the first increment.
-
-#### Working checkpoint: v0.2.0
-
-**Main question:**
-
-Can organizers manage events while volunteers can browse and search for available opportunities?
-
-**Scope:**
-- Implement event creation.
-- Implement event editing.
-- Implement event cancellation.
-- Allow volunteers to browse available events.
-- Implement event searching.
-- Display event details.
-- Integrate event functionality with authentication and role permissions.
-
-**Tools:**
-- Agentic AI coding tool.
-- Git and GitHub.
-- Selected application technologies.
-- Automated testing tools.
-
-**Deliverables:**
-- Functional event management module.
-- Event browsing and searching functionality.
-- Updated database schema.
-- Automated test results.
-- Updated technical documentation.
-
-**Acceptance criteria:**
-- Authorized organizers can create events.
-- Organizers can edit and cancel their events.
-- Volunteers can browse available events.
-- Volunteers can search for events.
-- Unauthorized users cannot perform organizer-only operations.
-- Event information is stored and retrieved correctly.
-- Relevant automated tests pass.
-
----
-
-## Increment 3: Volunteer Applications and Assignments
-
-**Versions:** `v0.3.0-design` → `v0.3.0`
-
-**Objective:**
-
-Allow volunteers to apply for events and enable organizers to review applications, make approval decisions and assign tasks and responsibilities to approved volunteers.
-
-#### Design checkpoint: v0.3.0-design
-
-**Main question:**
-
-How will volunteers apply to events, how will organizers process applications, and how will approved volunteers receive assignments?
-
-**Scope:**
-- Define the volunteer application process.
-- Define application statuses: Pending, Approved and Rejected.
-- Design the application review and approval workflow.
-- Define event capacity enforcement during approval.
-- Design task and responsibility assignment workflows.
-- Update the ERD to include Application and Task entities and their relationships.
-
-**Tools:**
-- PlantUML.
-- Mermaid.
-- Database modeling tools.
-- Markdown documentation.
-- GitHub.
-
-**Deliverables:**
-- Application workflow diagrams.
-- Assignment workflow diagrams.
-- Low-Level Sequence Diagram deliverables for Volunteer, Event Organizer and Administrator. The Volunteer “Apply for Events” diagram already exists at `uml/sequence_diagram.mmd`, is included as completed existing work and is not to be recreated or modified. Prepare the remaining two actor diagrams after all three High-Level Sequence Diagrams have been completed and reviewed.
-- Updated ERD.
-- Application status specifications.
-- Updated requirements documentation.
-
-**Acceptance criteria:**
-- All three Low-Level Sequence Diagrams are included in the design deliverables.
-- Application submission and review processes are documented.
-- Application statuses and their transitions are defined.
-- Event capacity rules are documented.
-- Task assignment rules are defined.
-- Relationships between volunteers, events, applications and tasks are represented in the ERD.
-- The design is reviewed and approved.
-
-#### Working checkpoint: v0.3.0
-
-**Main question:**
-
-Can volunteers apply to events, can organizers process applications, and can approved volunteers receive assigned tasks?
-
-**Scope:**
-- Implement volunteer application submission.
-- Allow volunteers to view their applications.
-- Allow organizers to review applications.
-- Implement application approval and rejection.
-- Update application status.
-- Enforce event capacity when approving applications.
-- Allow organizers to assign tasks to approved volunteers.
-- Allow volunteers to view their assigned tasks.
-
-**Tools:**
-- Agentic AI coding tool.
-- Git and GitHub.
-- Selected application technologies.
-- Automated testing tools.
-
-**Deliverables:**
-- Functional application management module.
-- Application status tracking.
-- Event capacity enforcement.
-- Task assignment functionality.
-- Updated database schema.
-- Automated test results.
-- Updated technical documentation.
-
-**Acceptance criteria:**
-- Volunteers can apply to available events.
-- Organizers can view applications for their events.
-- Organizers can approve or reject applications.
-- Application statuses are updated correctly.
-- Event capacity cannot be exceeded through application approval.
-- Only approved volunteers can receive task assignments.
-- Volunteers can view their assigned tasks.
-- Relevant automated tests pass.
-
----
-
-## Increment 4: Attendance, Hours Tracking and Reports
-
-**Versions:** `v0.4.0-design` → `v0.4.0`
-
-**Objective:**
-
-Complete the main volunteer participation process by recording attendance, calculating volunteer participation hours and providing participation reports and platform statistics.
-
-#### Design checkpoint: v0.4.0-design
-
-**Main question:**
-
-How will the system record volunteer attendance, calculate volunteer participation hours and generate participation reports?
-
-**Scope:**
-- Define attendance recording requirements.
-- Design the attendance recording workflow.
-- Define how attendance relates to volunteers and events.
-- Specify the volunteer-hours calculation rules.
-- Design volunteer participation history.
-- Define event participation reporting.
-- Define administrator platform statistics.
-- Update the ERD to include Attendance and any required data structures.
-
-**Tools:**
-- PlantUML.
-- Database modeling tools.
-- Markdown documentation.
-- GitHub.
-
-**Deliverables:**
-- Attendance workflow diagram.
-- Volunteer-hours calculation specifications.
-- Updated ERD.
-- Reporting and statistics specifications.
-- Updated requirements documentation.
-
-**Acceptance criteria:**
-- Attendance recording rules are documented.
-- The volunteer-hours calculation method is defined.
-- Attendance records are associated with the correct volunteers and events.
-- Reporting requirements for organizers and administrators are specified.
-- The design is consistent with the previous increments.
-- The design is reviewed and approved.
-
-#### Working checkpoint: v0.4.0
-
-**Main question:**
-
-Can the system accurately record attendance, calculate volunteer hours and provide useful participation reports?
-
-**Scope:**
-- Implement attendance recording by organizers.
-- Store volunteer attendance records.
-- Calculate volunteer participation hours according to the agreed rules.
-- Allow volunteers to view accumulated hours.
-- Display volunteer participation history.
-- Generate event participation reports for organizers.
-- Provide overall platform statistics for administrators.
-
-**Tools:**
-- Agentic AI coding tool.
-- Git and GitHub.
-- Selected application technologies.
-- Automated testing tools.
-
-**Deliverables:**
-- Functional attendance module.
-- Volunteer-hours tracking functionality.
-- Volunteer participation history.
-- Event participation reports.
-- Administrator statistics.
-- Automated test results.
-- Updated technical documentation.
-
-**Acceptance criteria:**
-- Organizers can record volunteer attendance.
-- Attendance records are stored correctly.
-- Volunteer hours are calculated according to the agreed rules.
-- Volunteers can view their accumulated hours and participation history.
-- Organizers can view event participation reports.
-- Administrators can view overall platform statistics.
-- Relevant automated tests pass.
-
----
-
-### 4. Final Integration and Release
-
-**Version:** `v1.0.0`
-
-After completing the four increments, the team will integrate and validate the complete application.
-
-**Main question:**
-
-Do all implemented modules work together correctly to support the complete Event & Volunteer Management System workflow?
-
-**Tools:**
-- Git and GitHub.
-- Agentic AI coding tool.
-- Automated testing tools.
-- Markdown documentation.
-
-**Activities:**
-- Integrate all four increments.
-- Verify authentication and role permissions across all modules.
-- Test the complete volunteer journey, from registration and event discovery to application, assignment, attendance and hours tracking.
-- Test organizer and administrator workflows.
-- Perform integration and system testing.
-- Fix identified defects.
-- Review and finalize UML diagrams and database documentation.
-- Finalize project documentation and prepare the final demonstration.
-
-**Deliverables:**
-- Fully integrated application.
-- Complete and updated UML diagrams.
-- Final database schema.
-- System and integration test results.
-- Updated AI development log.
-- Updated traceability matrix.
-- Final README and technical documentation.
-- Final project report and demonstration.
-
-**Acceptance criteria:**
-- All applicable functional and non-functional requirements are implemented and validated.
-- All three user roles can perform their authorized operations.
-- All four increments work together correctly.
-- Critical user workflows pass system testing.
-- No critical unresolved defects remain.
-- Documentation and diagrams reflect the final implementation.
-- The system is ready for final demonstration.
-
----
-
-### 5. Development and Version Control Process
-
-The following process will be followed for every increment:
-
-1. Review and finalize the requirements for the selected increment.
-2. Prepare the relevant architecture, UML and database designs.
-3. Review and approve the design checkpoint.
-4. Merge the reviewed design work and create its `-design` version tag.
-5. Use an Agentic AI coding tool to implement the approved functionality.
-6. Review the AI-generated code and verify its consistency with the design.
-7. Generate and execute appropriate automated tests.
-8. Correct identified implementation or testing issues.
-9. Open a GitHub pull request for review.
-10. Merge the completed increment into the integration branch.
-11. Create the working-version tag on the reviewed and merged commit.
-12. Update the AI development log, traceability matrix, testing documentation and relevant diagrams.
-
-All meaningful Agentic AI tasks will be documented in the `/prompts/` directory using Markdown files. The team will maintain `/docs/ai_development_log.md` and `/docs/traceability_matrix.md` throughout development.
-
-### 6. Final Release
-
-The final release, `v1.0.0`, will represent the completed, integrated, tested and documented Event & Volunteer Management System.
+**Main Question:** Can users register and authenticate safely while only administrators can view accounts and assign roles?
 
+**Tools:** React, Node.js/Express, MySQL, Git/GitHub, Node.js built-in `node:test` runner.
+
+**Acceptance Criteria:**
+
+- Registration, login, and logout are implemented through `AuthController`; users have one valid `UserRole`.
+- Passwords are salted and hashed; duplicate/invalid email and invalid credentials are rejected with safe messages.
+- New public accounts always receive `VOLUNTEER`; the backend ignores/rejects submitted privileged roles.
+- Administrator provisioning is a guarded manual setup; role assignment is administrator-only and validated server-side.
+- `tests/auth/` and `tests/admin/` cover registration, hash verification, login/logout, forced default role, authorization, role updates, and provisioning safeguards.
+- A demo shows UC01 and UC02; no later-increment workflow is included.
+
+### v0.2.0-design — Event Management & Exploration design
+
+**Main Question:** How can organizers manage events and volunteers discover and apply without exceeding event capacity?
+
+**Tools:** PlantUML, Mermaid CLI, Git/GitHub, Markdown.
+
+**Acceptance Criteria:**
+
+- Planned Increment 2 diagrams define UC03/UC04 and the required event/application persistence.
+- FR-05–FR-10 trace to diagrams, domain relationships, and capacity/duplicate checks.
+- Deferred diagram sources are kept under `uml/increment2/` and do not alter the v0.1.0 scope.
+
+### v0.2.0 — Event Management & Exploration implementation
+
+**Main Question:** Can organizers publish events and volunteers find and apply to eligible events?
+
+**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`.
+
+**Acceptance Criteria:**
+
+- Event creation/edit/cancel and event browse/search/details/application flows implement FR-05–FR-10.
+- Capacity, event status, and duplicate-application rules are checked by the backend.
+- `tests/events/` and `tests/explore/` cover success, invalid input, capacity, and duplicate cases; demo covers UC03/UC04.
+
+### v0.3.0-design — Applications, Tasks & Attendance design
+
+**Main Question:** How do application decisions control task assignment and attendance/hour records?
+
+**Tools:** PlantUML, Mermaid CLI, Git/GitHub, Markdown.
+
+**Acceptance Criteria:**
+
+- Planned Increment 3 UML and ERD cover UC05/UC06 and FR-11–FR-18.
+- Approval capacity, approved-volunteer task eligibility, attendance ownership, and hour calculation are explicit.
+- Planned diagrams are stored under `uml/increment3/`; earlier increments remain traceable.
+
+### v0.3.0 — Applications, Tasks & Attendance implementation
+
+**Main Question:** Can organizers process applications, assign eligible volunteers, and record participation accurately?
+
+**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`.
+
+**Acceptance Criteria:**
+
+- Application decisions, task assignment, attendance, and hours implement FR-11–FR-18.
+- `tests/applications/` and `tests/attendance/` cover authorization, capacity, eligibility, and non-negative hour calculations.
+- Demo covers UC05/UC06 and their validation/error paths.
+
+### v0.4.0-design — Statistics & Analytics design
+
+**Main Question:** Which event and platform metrics must be calculated, and who may view them?
+
+**Tools:** PlantUML, Mermaid CLI, Git/GitHub, Markdown.
+
+**Acceptance Criteria:**
+
+- Planned Increment 4 models cover UC07, FR-19, and FR-21.
+- Organizer event metrics and administrator platform metrics have distinct authorization and data scope.
+- Planned sources are stored under `uml/increment4/` and map to existing entities from earlier increments.
+
+### v0.4.0 — Statistics & Analytics implementation
+
+**Main Question:** Can authorized organizers and administrators view accurate scoped statistics?
+
+**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`.
+
+**Acceptance Criteria:**
+
+- Event and platform reports implement FR-19 and FR-21 with correct role and ownership checks.
+- `tests/analytics/` verifies metric calculations, filters, and denied access.
+- Demo presents event-level and platform-level reporting.
+
+### v1.0.0 — Final Integration
+
+**Main Question:** Do all increments work together as a secure, usable, and traceable system?
+
+**Tools:** React, Node.js/Express, MySQL, Git/GitHub, `node:test`, browser automation selected during implementation, PlantUML/Mermaid.
+
+**Acceptance Criteria:**
+
+- UC01–UC07 and FR-01–FR-21 work across integrated frontend, API, and database layers.
+- The complete unit, integration, security, and end-to-end suites pass; `tests/e2e/` covers primary role journeys.
+- Release demo, deployment/configuration instructions, final diagrams, and requirement traceability are reviewed.
+- Security and performance NFR evidence is recorded; no requirement is marked satisfied without verification.
+
+## Confirmed Increment 1 Role Policy
+
+Public registration always assigns `VOLUNTEER`. The first Administrator is created through guarded manual provisioning. After that bootstrap, only Administrators may assign or change roles. The current simplified Increment 1 class diagram is limited to `AuthController`, `AdminUserController`, `User`, and `UserRole`.

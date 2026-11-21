@@ -1,0 +1,30 @@
+﻿@startuml SD03_Low_Level_UC01_Auth
+title SD03 - Low-Level Sequence Diagram: UC01 User Account & Authentication
+autonumber
+actor User
+participant ":AuthController" as Auth
+participant ":User" as U
+
+User -> Auth : register(name, email, password)
+activate Auth
+Auth -> U ** : <<create>> User(name, email, passwordHash, UserRole.VOLUNTEER)
+activate U
+U --> Auth : User
+deactivate U
+Auth --> User : User
+deactivate Auth
+
+User -> Auth : login(email, password)
+activate Auth
+Auth -> U : verifyPassword(password)
+activate U
+U --> Auth : Boolean (true)
+deactivate U
+Auth --> User : Boolean (true)
+deactivate Auth
+
+User -> Auth : logout()
+activate Auth
+Auth --> User : void
+deactivate Auth
+@enduml

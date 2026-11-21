@@ -1,0 +1,25 @@
+﻿@startuml SD04_Low_Level_UC02_UserManagement
+title SD04 - Low-Level Sequence Diagram: UC02 User Management & RBAC
+autonumber
+actor Administrator as Admin
+participant ":AdminUserController" as AdminCtrl
+participant ":User" as U
+
+Admin -> AdminCtrl : viewUsers()
+activate AdminCtrl
+AdminCtrl -> U : getAllUsers()
+activate U
+U --> AdminCtrl : List<User>
+deactivate U
+AdminCtrl --> Admin : List<User>
+deactivate AdminCtrl
+
+Admin -> AdminCtrl : assignRole(userId, role)
+activate AdminCtrl
+AdminCtrl -> U : setRole(role: UserRole)
+activate U
+U --> AdminCtrl : User
+deactivate U
+AdminCtrl --> Admin : User
+deactivate AdminCtrl
+@enduml
