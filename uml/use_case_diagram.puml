@@ -1,135 +1,23 @@
-@startuml use_case_diagram
-title Event & Volunteer Management System - Use Case Diagram
-
-top to bottom direction
-skinparam linetype ortho
-skinparam nodesep 80
-skinparam ranksep 80
-
-' Actors are deliberately kept in one row above the system boundary.
-actor "User" as user
-actor "Administrator" as admin
-actor "Event Organizer" as organizer
-actor "Volunteer" as volunteer
-actor "Email Service" as email
-actor "Cloud Backup Storage" as backup
-
-admin -|> user
-organizer -|> user
-volunteer -|> user
-
-user -[hidden]right-> admin
-admin -[hidden]right-> organizer
-organizer -[hidden]right-> volunteer
-volunteer -[hidden]right-> email
-email -[hidden]right-> backup
-
-rectangle "Event & Volunteer Management System" {
-  package "User Use Cases" {
-    usecase "Create a User Account" as UC01
-    usecase "User Login and Logout" as UC02
-  }
-
-  package "Administrator Use Cases" {
-    usecase "User Roles Management" as UC03
-    usecase "Manage User Accounts" as UC20
-    usecase "View Overall Platform Statistics" as UC21
-  }
-
-  package "Event Organizer Use Cases" {
-    usecase "Create Events" as UC05
-    usecase "Edit and Cancel Events" as UC06
-    usecase "View Event Applications" as UC11
-    usecase "Approve or Reject Applications" as UC12
-    usecase "Assign Tasks to Volunteers" as UC14
-    usecase "Record Volunteer Attendance" as UC16
-    usecase "Calculate Volunteer Hours" as UC17
-    usecase "View Event Participation Statistics" as UC19
-  }
-
-  package "Volunteer Use Cases" {
-    usecase "Browse Events" as UC07
-    usecase "Search Events" as UC08
-    usecase "View Event Details" as UC09
-    usecase "Apply for Events" as UC10
-    usecase "View Application Status" as UC13
-    usecase "View Assigned Tasks" as UC15
-    usecase "View Attendance Records and Total Hours" as UC18
-  }
-
-  package "Operational Use Cases" {
-    usecase "Perform Automated Daily Backup" as UC22
-    usecase "Recover Service and Restore Data" as UC23
-  }
-
-  package "Authorization" {
-    usecase "Role-Based Access Control" as UC04
-  }
-
-  ' Keep the actor lanes and their use-case groups aligned horizontally.
-  UC01 -[hidden]right-> UC03
-  UC03 -[hidden]right-> UC05
-  UC05 -[hidden]right-> UC07
-  UC07 -[hidden]right-> UC22
-  UC22 -[hidden]right-> UC04
-
-  user -[hidden]down-> UC01
-  admin -[hidden]down-> UC03
-  organizer -[hidden]down-> UC05
-  volunteer -[hidden]down-> UC07
-  email -[hidden]down-> UC12
-  backup -[hidden]down-> UC22
-}
-
-' Associations from the actors to their dedicated lanes.
-user -- UC01
-user -- UC02
-
-admin -- UC03
-admin -- UC20
-admin -- UC21
-
-organizer -- UC05
-organizer -- UC06
-organizer -- UC11
-organizer -- UC12
-organizer -- UC14
-organizer -- UC16
-organizer -- UC17
-organizer -- UC19
-
-volunteer -- UC07
-volunteer -- UC08
-volunteer -- UC09
-volunteer -- UC10
-volunteer -- UC13
-volunteer -- UC15
-volunteer -- UC18
-
-email -- UC01
-email -- UC12
-backup -- UC22
-backup -- UC23
-
-' Representative module include links; FR-04 applies to all protected operations.
-UC05 .> UC04 : <<include>>
-UC10 .> UC04 : <<include>>
-UC16 .> UC04 : <<include>>
-UC20 .> UC04 : <<include>>
-
-note right of UC04
-  Applies to every protected operation
-  (FR-04 Role-Based Access Control)
-end note
-
-UC08 .> UC07 : <<extend>>
-UC09 .> UC07 : <<extend>>
-UC17 .> UC16 : <<include>>
-
-legend bottom
-  --   Association
-  .>   <<include>> or <<extend>>
-  -|>  Generalization
-endlegend
-
+﻿@startuml use_case
+ title Event & Volunteer Management System — Increment 1 Use Cases
+ left to right direction
+ skinparam shadowing false
+ skinparam packageStyle rectangle
+ skinparam usecase {
+   BackgroundColor #E8F3FF
+   BorderColor #285B86
+ }
+ actor User as User
+ actor Administrator as Admin
+ actor "Event Organizer" as Organizer
+ actor Volunteer
+ Admin --|> User
+ Organizer --|> User
+ Volunteer --|> User
+ rectangle "Volunteer Management System" {
+   usecase "UC01\nUser Account & Authentication" as UC01
+   usecase "UC02\nUser Management & RBAC" as UC02
+ }
+ User -- UC01
+ Admin -- UC02
 @enduml
