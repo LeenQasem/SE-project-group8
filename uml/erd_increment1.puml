@@ -30,18 +30,6 @@ entity "User" as USER {
 }
 
 ROLE ||--o{ USER : assigned to
-entity "UserSession" as USER_SESSION {
-  * session_id : BIGINT <<PK>>
-  --
-  user_id : BIGINT <<FK>>
-  token_hash : CHAR(64) <<UNIQUE>>
-  created_at : DATETIME
-  expires_at : DATETIME
-  revoked_at : DATETIME
-}
-
-ROLE ||--o{ USR : assigned to
-USR ||--o{ USER_SESSION : has
 
 note top of ROLE
   Seed roles: Administrator,
