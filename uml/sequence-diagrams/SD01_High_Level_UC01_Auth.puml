@@ -1,19 +1,29 @@
-﻿@startuml SD01_High_Level_UC01_Auth
+@startuml SD01_High_Level_UC01_Auth
 title SD01 - High-Level Sequence Diagram: UC01 User Account & Authentication
 autonumber
 actor User
-participant ":VolunteerManagementSystem" as System
+participant "Volunteer Management System" as System
 
 User -> System : register(name, email, password)
 activate System
-System --> User : User (role = VOLUNTEER)
+alt Registration information is valid and email is available
+    System --> User : Account created (role: Volunteer)
+else Registration information is invalid or email is already registered
+    System --> User : Registration failed with a correction message
+end
 deactivate System
+
 User -> System : login(email, password)
 activate System
-System --> User : Boolean (true)
+alt Credentials are valid
+    System --> User : Login successful
+else Credentials are invalid
+    System --> User : Login failed; check email and password
+end
 deactivate System
+
 User -> System : logout()
 activate System
-System --> User : void
+System --> User : Logout successful
 deactivate System
 @enduml
