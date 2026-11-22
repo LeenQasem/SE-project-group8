@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="application-name" content="Volunteer Management System">
   <title>Volunteer Management — Increment 1 Demo</title>
   <style>
     :root { color-scheme: light; font: 16px/1.5 system-ui, sans-serif; color: #172b4d; background: #f3f6fa; }
@@ -13,23 +14,78 @@
     button { margin-top:.8rem; color:white; border:0; background:#176b87; cursor:pointer; font-weight:650; } button.secondary { background:#496579; }
     .row { display:flex; gap:.6rem; } .row button { flex:1; } .muted { color:#526779; font-size:.92rem; } #status { white-space:pre-wrap; padding:.8rem 1rem; background:#e8f2f5; border-radius:8px; }
     table { width:100%; border-collapse:collapse; margin-top:1rem; font-size:.92rem; } th,td { text-align:left; padding:.5rem; border-bottom:1px solid #e1e8ee; }
+    :root { color-scheme: light; font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#18344d; background:#f6f8fb; --navy:#0f2942; --teal:#0d7490; --line:#e1e8ef; --muted:#64778a; }
+    * { box-sizing:border-box; }
+    body { min-width:320px; color:#18344d; background:#f6f8fb; }
+    header { min-height:76px; padding:1rem max(1rem,calc((100% - 1120px)/2)); display:flex; align-items:center; justify-content:space-between; gap:1rem; color:#fff; background:#0f2942; box-shadow:0 3px 16px #0b22331c; }
+    header h1 { margin:0; font-size:1.15rem; letter-spacing:-.02em; } header > div { color:#bdcbd6; font-size:.85rem; }
+    main { max-width:1120px; margin:2rem auto; padding:0 1.25rem; display:grid; gap:1.25rem; grid-template-columns:minmax(0,1.3fr) minmax(300px,.9fr); align-items:start; }
+    section { min-width:0; padding:1.4rem; background:#fff; border:1px solid #e1e8ef; border-radius:15px; box-shadow:0 8px 26px #17334d09; }
+    section h2 { margin:0 0 1rem; color:#0f2942; font-size:1.1rem; letter-spacing:-.02em; }
+    #account-card { grid-row:span 2; } .auth-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+    #login,#register { min-width:0; } #register { padding-left:1.2rem; border-left:1px solid #e1e8ef; }
+    form h3 { margin:.2rem 0 .8rem; color:#18344d; font-size:.95rem; }
+    label { display:block; margin:.7rem 0 .25rem; color:#38536a; font-size:.8rem; font-weight:700; }
+    input,select,button { box-sizing:border-box; width:100%; padding:.65rem .75rem; border:1px solid #cdd8e2; border-radius:9px; font:inherit; }
+    input:focus,select:focus { outline:0; border-color:#0d7490; box-shadow:0 0 0 3px #0d74901c; }
+    button { margin-top:.8rem; color:#fff; border:1px solid transparent; background:#0d7490; cursor:pointer; font-weight:700; transition:background .15s,box-shadow .15s; }
+    button:hover { background:#095e76; box-shadow:0 4px 12px #0d749029; } button:focus-visible { outline:3px solid #62c7d5; outline-offset:2px; }
+    button.secondary { width:auto; margin:0; padding:.5rem .8rem; color:#eaf2f6; background:#ffffff14; border-color:#ffffff45; }
+    .role-pill { display:inline-flex; align-items:center; gap:.35rem; padding:.2rem .6rem; border-radius:999px; font-size:.7rem; font-weight:750; white-space:nowrap; }
+    .role-pill:before { width:6px; height:6px; content:""; background:currentColor; border-radius:50%; }
+    .role-administrator { color:#166447; background:#e5f5ed; } .role-event-organizer { color:#7a4b12; background:#fff2dc; } .role-volunteer { color:#245d94; background:#e8f2fc; } .role-unknown { color:#5e7081; background:#edf1f4; }
+    #workspace-profile { padding:.9rem; display:flex; align-items:center; gap:.75rem; background:#f5f9fb; border:1px solid #e5edf2; border-radius:11px; }
+    #workspace-avatar { flex:0 0 40px; width:40px; height:40px; display:grid; place-items:center; color:#0d7490; background:#dff2f5; border-radius:12px; font-weight:800; }
+    #workspace-details { min-width:0; } #workspace-name,#workspace-email { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    #workspace-name { color:#0f2942; font-weight:700; } #workspace-email { color:#64778a; font-size:.8rem; }
+    .capability-title { margin:1rem 0 .35rem; color:#526a7e; font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    #capabilities { margin:.2rem 0 1rem; padding:0; list-style:none; color:#526779; font-size:.8rem; } #capabilities li { margin:.35rem 0; } #capabilities li:before { content:"✓"; margin-right:.5rem; color:#0d7490; font-weight:800; }
+    #admin-access { padding:.65rem .75rem; border-radius:8px; font-size:.78rem; } #admin-access.allowed { color:#176449; background:#eaf6ef; } #admin-access.restricted { color:#67798a; background:#f0f3f6; }
+    #users { overflow-x:auto; } table { width:100%; border-collapse:collapse; margin-top:.8rem; font-size:.85rem; } th,td { text-align:left; padding:.65rem; border-bottom:1px solid #e8edf1; } th { color:#718397; background:#f6f8fa; font-size:.68rem; letter-spacing:.07em; text-transform:uppercase; } tbody tr:hover { background:#f7fbfc; }
+    #users td select { min-width:125px; padding:.45rem; } #users td button { width:auto; margin:.3rem 0 .3rem .4rem; padding:.45rem .65rem; font-size:.8rem; }
+    #status { grid-column:1/-1; white-space:pre-wrap; padding:.8rem 1rem; color:#53697c; background:#fff; border:1px solid #e1e8ef; border-radius:10px; box-shadow:0 4px 16px #17334d06; }
+    #status.success { color:#176449; background:#f1faf5; border-color:#cbe9d8; } #status.error { color:#9a3f3f; background:#fff5f4; border-color:#f1d2ce; }
+    @media (max-width:760px) { main { grid-template-columns:1fr; margin-top:1.3rem; } #account-card { grid-row:auto; } }
+    @media (max-width:560px) { header { align-items:flex-start; flex-direction:column; } .auth-grid { grid-template-columns:1fr; } #register { padding:1rem 0 0; border-top:1px solid #e1e8ef; border-left:0; } section { padding:1.1rem; } }
   </style>
 </head>
 <body>
-  <header><h1>Volunteer Management System</h1><div>Increment 1 demo: registration, login, and role management</div></header>
+  <header><div><h1>Volunteer Management</h1><div>Increment 1 · Account &amp; access</div></div><div id="session" class="muted">Not signed in</div><button type="button" class="secondary" id="logout" hidden>Logout</button></header>
   <main>
-    <section><h2>Account</h2><div id="session" class="muted">Not signed in</div>
-      <form id="register"><h3>Register</h3><label for="name">Name</label><input id="name" required maxlength="150" autocomplete="name"><label for="reg-email">Email</label><input id="reg-email" type="email" required autocomplete="email"><label for="reg-password">Password</label><input id="reg-password" type="password" required autocomplete="new-password"><button>Create volunteer account</button></form>
-      <form id="login"><h3>Login</h3><label for="login-email">Email</label><input id="login-email" type="email" required autocomplete="username"><label for="login-password">Password</label><input id="login-password" type="password" required autocomplete="current-password"><div class="row"><button>Login</button><button type="button" class="secondary" id="logout">Logout</button></div></form>
+    <section id="account-card"><h2>Account</h2><div class="auth-grid">
+      <form id="login"><h3>Sign in</h3><label for="login-email">Email</label><input id="login-email" type="email" required autocomplete="username"><label for="login-password">Password</label><input id="login-password" type="password" required autocomplete="current-password"><button>Sign in</button></form>
+      <form id="register"><h3>Create volunteer account</h3><label for="name">Full name</label><input id="name" required maxlength="150" autocomplete="name"><label for="reg-email">Email</label><input id="reg-email" type="email" required autocomplete="email"><label for="reg-password">Password</label><input id="reg-password" type="password" required autocomplete="new-password"><button>Create account</button><p class="muted">New accounts receive the Volunteer role.</p></form>
+      </div>
     </section>
-    <section><h2>Administrator role management</h2><p class="muted">Sign in with an administrator account to view users and update roles.</p><button id="refresh">Load users</button><div id="users"></div></section>
-    <section style="grid-column:1/-1"><h2>Activity</h2><div id="status" role="status" aria-live="polite">Ready.</div></section>
+    <section id="workspace-card"><h2>Workspace / Role Overview</h2><div id="workspace-profile"><div id="workspace-avatar">?</div><div id="workspace-details"><strong id="workspace-name">Guest</strong><span id="workspace-email">Sign in to view your profile</span><span id="workspace-role" class="role-pill role-unknown">Signed out</span></div></div><p class="capability-title">Available capabilities</p><ul id="capabilities"><li>Create a Volunteer account</li><li>Sign in to your workspace</li></ul><div id="admin-access" class="restricted">Administrator user management is restricted. Sign in as an Administrator to unlock it.</div></section>
+    <section style="grid-column:1/-1"><h2>Administrator Role Management</h2><p class="muted">Review registered accounts and assign system roles.</p><button id="refresh">Load users</button><div id="users"></div></section>
+    <div id="status" role="status" aria-live="polite">Ready.</div>
   </main>
   <script>
     let token = null;
     const $ = id => document.getElementById(id);
-    function message(value) { $('status').textContent = value; }
+    function message(value, kind = '') { $('status').textContent = value; $('status').className = kind; }
     function updateSession(user) { $('session').textContent = user ? `${user.full_name} · ${user.email} · ${user.role.role_name}` : 'Not signed in'; }
+    function roleClass(role) { return ({Administrator:'role-administrator','Event Organizer':'role-event-organizer',Volunteer:'role-volunteer'})[role] || 'role-unknown'; }
+    function updateSession(user) {
+      const session = $('session'); session.replaceChildren();
+      if (!user) {
+        session.textContent = 'Not signed in'; $('workspace-avatar').textContent = '?'; $('workspace-name').textContent = 'Guest'; $('workspace-email').textContent = 'Sign in to view your profile';
+        $('workspace-role').className = 'role-pill role-unknown'; $('workspace-role').textContent = 'Signed out'; $('logout').hidden = true;
+        $('admin-access').className = 'restricted'; $('admin-access').textContent = 'Administrator user management is restricted. Sign in as an Administrator to unlock it.';
+        $('users').replaceChildren(); return;
+      }
+      const role = user.role.role_name;
+      const identity = document.createElement('span'); identity.textContent = `${user.full_name} · ${user.email}`;
+      const badge = document.createElement('span'); badge.className = `role-pill ${roleClass(role)}`; badge.textContent = role;
+      session.append(identity, badge); $('workspace-avatar').textContent = (user.full_name.trim()[0] || '?').toUpperCase();
+      $('workspace-name').textContent = user.full_name; $('workspace-email').textContent = user.email;
+      $('workspace-role').className = `role-pill ${roleClass(role)}`; $('workspace-role').textContent = role; $('logout').hidden = false;
+      const capabilities = role === 'Administrator' ? ['View all registered users','Assign roles to registered accounts','Manage the Increment 1 workspace'] : ['Access your signed-in account','Administrator user management is restricted'];
+      $('capabilities').replaceChildren(...capabilities.map(text => { const item = document.createElement('li'); item.textContent = text; return item; }));
+      const allowed = role === 'Administrator'; $('admin-access').className = allowed ? 'allowed' : 'restricted';
+      $('admin-access').textContent = allowed ? 'Administrator user management is unlocked for your account.' : `Administrator user management is restricted for the ${role} role.`;
+    }
     async function api(path, options = {}) {
       const headers = {'Content-Type':'application/json', ...(options.headers || {})};
       if (token) headers.Authorization = `Bearer ${token}`;
@@ -40,25 +96,25 @@
     }
     $('register').addEventListener('submit', async event => {
       event.preventDefault();
-      try { const user = await api('/api/auth/register', {method:'POST', body:JSON.stringify({name:$('name').value,email:$('reg-email').value,password:$('reg-password').value})}); message(`Account created for ${user.full_name}. You can now log in.`); event.target.reset(); }
-      catch (error) { message(error.message); }
+      try { const user = await api('/api/auth/register', {method:'POST', body:JSON.stringify({name:$('name').value,email:$('reg-email').value,password:$('reg-password').value})}); message(`Account created for ${user.full_name} with the Volunteer role. You can now sign in.`, 'success'); event.target.reset(); }
+      catch (error) { message(error.message, 'error'); }
     });
     $('login').addEventListener('submit', async event => {
       event.preventDefault();
-      try { const data = await api('/api/auth/login', {method:'POST', body:JSON.stringify({email:$('login-email').value,password:$('login-password').value})}); token=data.access_token; updateSession(data.user); message('Login successful.'); event.target.reset(); }
-      catch (error) { message(error.message); }
+      try { const data = await api('/api/auth/login', {method:'POST', body:JSON.stringify({email:$('login-email').value,password:$('login-password').value})}); token=data.access_token; updateSession(data.user); message('Sign in successful.', 'success'); event.target.reset(); }
+      catch (error) { message(error.message, 'error'); }
     });
     $('logout').addEventListener('click', async () => {
-      if (!token) { message('Sign in before logging out.'); return; }
-      try { await api('/api/auth/logout', {method:'POST'}); message('Logged out.'); }
-      catch (error) { message(error.message); }
+      if (!token) { message('Sign in before logging out.', 'error'); return; }
+      try { await api('/api/auth/logout', {method:'POST'}); message('You have been signed out.', 'success'); }
+      catch (error) { message(error.message, 'error'); }
       finally { token=null; updateSession(null); $('users').replaceChildren(); }
     });
     $('refresh').addEventListener('click', async () => {
-      try { const data=await api('/api/admin/users'); const table=document.createElement('table'); table.innerHTML='<thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Change role</th></tr></thead>'; const body=document.createElement('tbody');
-        for (const user of data.users) { const row=document.createElement('tr'); const name=document.createElement('td'); name.textContent=user.full_name; const email=document.createElement('td'); email.textContent=user.email; const current=document.createElement('td'); current.textContent=user.role.role_name; const cell=document.createElement('td'); const select=document.createElement('select'); for (const [value,label] of [['VOLUNTEER','Volunteer'],['EVENT_ORGANIZER','Event Organizer'],['ADMINISTRATOR','Administrator']]) { const option=document.createElement('option'); option.value=value; option.textContent=label; option.selected=user.role.role_name===label; select.append(option); } const button=document.createElement('button'); button.textContent='Save'; button.onclick=async()=>{ try { await api(`/api/admin/users/${user.user_id}/role`,{method:'PATCH',body:JSON.stringify({role:select.value})}); message(`Updated ${user.full_name}'s role.`); $('refresh').click(); } catch(error) { message(error.message); } }; cell.append(select,button); row.append(name,email,current,cell); body.append(row); }
-        table.append(body); $('users').replaceChildren(table); message(`Loaded ${data.users.length} users.`);
-      } catch (error) { message(error.message); }
+      try { const data=await api('/api/admin/users'); const table=document.createElement('table'); table.innerHTML='<thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Assign role</th></tr></thead>'; const body=document.createElement('tbody');
+        for (const user of data.users) { const row=document.createElement('tr'); const name=document.createElement('td'); name.textContent=user.full_name; const email=document.createElement('td'); email.textContent=user.email; const current=document.createElement('td'); const pill=document.createElement('span'); pill.className=`role-pill ${roleClass(user.role.role_name)}`; pill.textContent=user.role.role_name; current.append(pill); const cell=document.createElement('td'); const select=document.createElement('select'); select.setAttribute('aria-label', `Role for ${user.full_name}`); for (const [value,label] of [['VOLUNTEER','Volunteer'],['EVENT_ORGANIZER','Event Organizer'],['ADMINISTRATOR','Administrator']]) { const option=document.createElement('option'); option.value=value; option.textContent=label; option.selected=user.role.role_name===label; select.append(option); } const button=document.createElement('button'); button.textContent='Save'; button.onclick=async()=>{ try { await api(`/api/admin/users/${user.user_id}/role`,{method:'PATCH',body:JSON.stringify({role:select.value})}); message(`Updated ${user.full_name}'s role.`, 'success'); $('refresh').click(); } catch(error) { message(error.message, 'error'); } }; cell.append(select,button); row.append(name,email,current,cell); body.append(row); }
+        table.append(body); $('users').replaceChildren(table); message(`Loaded ${data.users.length} users.`, 'success');
+      } catch (error) { message(error.message, 'error'); }
     });
   </script>
 </body>
