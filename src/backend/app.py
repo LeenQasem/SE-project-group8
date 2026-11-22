@@ -8,7 +8,9 @@ deployment because this repository does not select a Python MySQL driver.
 from __future__ import annotations
 
 import json
+import os
 import re
+import sqlite3
 from datetime import date, datetime
 from http import HTTPStatus
 from pathlib import Path
@@ -104,12 +106,84 @@ def create_app_from_connection(connection, frontend_path=None):
 
 
 def serve(connection, host="127.0.0.1", port=8000):
-    """Run the demo using a caller-provided DB-API connection."""
+    """Run the API using a caller-provided DB-API connection."""
     from wsgiref.simple_server import make_server
     application = create_app_from_connection(connection)
     with make_server(host, port, application) as server:
-        print(f"Increment 1 demo listening at http://{host}:{port}/")
+        print(f"Server running at http://{host}:{port}", flush=True)
         server.serve_forever()
+
+
+def create_local_demo_connection():
+    """Initialize an in-memory SQLite database for direct local execution.
+
+    This intentionally small SQLite schema mirrors Increment 1's MySQL schema.
+    The local administrator credentials can be overridden with
+    ``DEMO_ADMIN_EMAIL`` and ``DEMO_ADMIN_PASSWORD``.
+    """
+    try:
+        from .models import hash_password
+    except ImportError:  # pragma: no cover - direct script execution
+        from models import hash_password
+
+    sqlite3.register_converter("DATETIME", lambda value: datetime.fromisoformat(value.decode("utf-8")))
+    connection = sqlite3.connect(":memory:", detect_types=sqlite3.PARSE_DECLTYPES)
+    connection.row_factory = sqlite3.Row
+    connection.executescript("""
+        PRAGMA foreign_keys = ON;
+        CREATE TABLE roles (
+            role_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            role_name TEXT NOT NULL UNIQUE CHECK (
+                role_name IN ('Administrator', 'Event Organizer', 'Volunteer')
+            )
+        );
+        CREATE TABLE users (
+            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL CHECK (length(trim(full_name)) BETWEEN 1 AND 150),
+            email TEXT NOT NULL UNIQUE CHECK (length(trim(email)) BETWEEN 1 AND 254),
+            password_hash TEXT NOT NULL CHECK (length(password_hash) > 0),
+            role_id INTEGER NOT NULL REFERENCES roles(role_id),
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TRIGGER users_updated_at AFTER UPDATE ON users
+        FOR EACH ROW WHEN NEW.updated_at = OLD.updated_at
+        BEGIN
+            UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE user_id = NEW.user_id;
+        END;
+        CREATE TABLE user_sessions (
+            session_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+            token_hash TEXT NOT NULL UNIQUE CHECK (length(token_hash) = 64),
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            expires_at DATETIME NOT NULL,
+            revoked_at DATETIME DEFAULT NULL,
+            CHECK (expires_at > created_at),
+            CHECK (revoked_at IS NULL OR revoked_at >= created_at)
+        );
+        CREATE INDEX ix_users_role_id ON users(role_id);
+        CREATE INDEX ix_user_sessions_user_expiry ON user_sessions(user_id, expires_at);
+        CREATE INDEX ix_user_sessions_active_expiry ON user_sessions(expires_at, revoked_at);
+    """)
+    connection.executemany(
+        "INSERT INTO roles (role_id, role_name) VALUES (?, ?)",
+        [(1, "Administrator"), (2, "Event Organizer"), (3, "Volunteer")],
+    )
+    email = os.environ.get("DEMO_ADMIN_EMAIL", "admin@example.com").strip().lower()
+    password = os.environ.get("DEMO_ADMIN_PASSWORD", "Admin123!")
+    if not email or not password:
+        raise ValueError("DEMO_ADMIN_EMAIL and DEMO_ADMIN_PASSWORD must be nonempty")
+    connection.execute(
+        "INSERT INTO users (full_name, email, password_hash, role_id) VALUES (?, ?, ?, ?)",
+        ("Demo Administrator", email, hash_password(password), 1),
+    )
+    connection.commit()
+    return connection
+
+
+def main():
+    """Start a self-contained local demo at 127.0.0.1:8000."""
+    serve(create_local_demo_connection(), host="127.0.0.1", port=8000)
 
 
 def _read_json(environ):
@@ -144,4 +218,8 @@ def _respond(start_response, status, data, content_type="application/json; chars
     return [body]
 
 
-__all__ = ["create_app", "create_app_from_connection", "serve"]
+__all__ = ["create_app", "create_app_from_connection", "create_local_demo_connection", "main", "serve"]
+
+
+if __name__ == "__main__":
+    main()
