@@ -47,6 +47,11 @@ def create_app(auth_controller, admin_controller, frontend_path=None):
             if method == "GET" and path == "/":
                 body, content_type = page.read_bytes(), "text/html; charset=utf-8"
                 return _respond(start_response, HTTPStatus.OK, body, content_type)
+            if method == "GET" and path == "/image.png":
+                image_path = page.parent / "image.png"
+                if not image_path.is_file():
+                    return _respond(start_response, HTTPStatus.NOT_FOUND, {"error": "Image not found"})
+                return _respond(start_response, HTTPStatus.OK, image_path.read_bytes(), "image/png")
             payload = _read_json(environ) if method in {"POST", "PATCH", "PUT"} else {}
             token = _bearer(environ)
             if method == "POST" and path == "/api/auth/register":
